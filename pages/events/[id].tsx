@@ -1,7 +1,7 @@
 import type { GetServerSideProps } from 'next';
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import EventLayout from '../../components/EventLayout';
-import type { Event } from '../../lib/Event';
+import { Event, getEvent } from '../../lib/events';
 import type { NextPageWithLayout } from '../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<ShowEventPageProps> = async ({ params }) => {
@@ -11,11 +11,8 @@ export const getServerSideProps: GetServerSideProps<ShowEventPageProps> = async 
     };
   }
 
-  const response = await fetch(`http://localhost:5984/eer/${params.id}`);
-  const event = await response.json();
-
   return {
-    props: { event: event }
+    props: { event: await getEvent(params.id as string) }
   };
 };
 

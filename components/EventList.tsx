@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ListGroup } from 'react-bootstrap';
-import type { Event } from '../lib/Event';
+import type { Event } from '../lib/events';
 
 export interface EventListProps {
   events: Event[];

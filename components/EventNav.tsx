@@ -1,5 +1,5 @@
 import { Nav } from 'react-bootstrap';
-import type { Event } from '../lib/Event';
+import type { Event } from '../lib/events';
 import ActiveLink from './ActiveLink';
 
 export interface EventNavProps {

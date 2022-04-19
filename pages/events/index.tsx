@@ -2,14 +2,11 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { Card } from 'react-bootstrap';
 import CreateEventForm from '../../components/CreateEventForm';
 import EventList from '../../components/EventList';
-import type { EventCursor } from '../../lib/Event';
+import { EventCursor, listEvents } from '../../lib/events';
 
 export const getServerSideProps: GetServerSideProps<IndexEventsPageProps> = async () => {
-  const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
-  const { rows } = await response.json();
-
   return {
-    props: { events: rows },
+    props: { events: await listEvents() },
   };
 };
 
