@@ -1,3 +1,5 @@
+import { Player } from './players';
+
 export interface Match {
   _id: string;
   _rev: string;
@@ -17,3 +19,15 @@ export const getMatches = async (eventId: string): Promise<Match[]> => {
 
   return rows.map((match) => match.value);
 };
+
+export const isWinner = (match: Match, player: Player): boolean => {
+  return match.winner === player._id;
+}
+
+export const isTie = (match: Match): boolean => {
+  return match.winner === 'tie';
+};
+
+export const isLoser = (match: Match, player: Player): boolean => {
+  return !!match.winner && match.winner !== player._id && match.winner !== 'tie';
+}

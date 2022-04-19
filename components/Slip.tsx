@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import type { Event } from '../lib/events';
 import { Match } from '../lib/matches';
-import type { Player } from '../lib/players';
-import { getMatchPoints, RankedPlayer } from '../lib/rankings';
+import { RankedPlayer } from '../lib/rankings';
 
 export interface SlipProps {
   event: Event;
