@@ -1,10 +1,11 @@
+import { without } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import EventLayout from '../../../components/EventLayout';
 import PlayerCreateForm from '../../../components/PlayerCreateForm';
 import PlayerList from '../../../components/PlayerList';
-import { addPlayerToEvent, Event, getEvent } from '../../../lib/events';
+import { addPlayerToEvent, Event, getEvent, removePlayerFromEvent } from '../../../lib/events';
 import { getPlayers, Player } from '../../../lib/players';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
@@ -37,13 +38,21 @@ const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ event: in
       <PlayerCreateForm
         className="mb-3"
         onPlayerCreate={async (player) => {
-          const newEvent = await addPlayerToEvent(event._id, player._id);
+          const updatedEvent = await addPlayerToEvent(event._id, player._id);
 
-          setEvent(newEvent);
+          setEvent(updatedEvent);
           setPlayers([...players, player]);
         }}
       />
-      <PlayerList players={players} />
+      <PlayerList
+        players={players}
+        onPlayerDelete={async (player) => {
+          const updatedEvent = await removePlayerFromEvent(event._id, player._id);
+          
+          setEvent(updatedEvent);
+          setPlayers(without(players, player));
+        }}
+      />
       {players.length === 0 && (
         <Card body className="text-center">
           <Card.Text>
