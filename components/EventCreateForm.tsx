@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 
-export interface CreateEventFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+export interface EventCreateFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
 }
 
-const CreateEventForm: React.FC<CreateEventFormProps> = ({ ...props }) => {
+const EventCreateForm: React.FC<EventCreateFormProps> = ({ ...props }) => {
   const [name, setName] = useState('');
 
   return (
@@ -30,4 +30,4 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ ...props }) => {
   );
 };
 
-export default CreateEventForm;
+export default EventCreateForm;

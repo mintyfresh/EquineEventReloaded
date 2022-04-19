@@ -1,6 +1,6 @@
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
-import CreatePlayerForm from '../../../components/CreatePlayerForm';
+import PlayerCreateForm from '../../../components/PlayerCreateForm';
 import EventLayout from '../../../components/EventLayout';
 import PlayerList from '../../../components/PlayerList';
 import { Event, getEvent } from '../../../lib/events';
@@ -30,7 +30,7 @@ interface EventPlayersPageProps {
 const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ players }) => {
   return (
     <>
-      <CreatePlayerForm className="mb-3" />
+      <PlayerCreateForm className="mb-3" />
       <PlayerList players={players.map((player) => player.value)} />
     </>
   );

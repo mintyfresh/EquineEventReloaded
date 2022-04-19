@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Button, Col, Form, Row, ToggleButton } from 'react-bootstrap';
 
-export interface CreatePlayerFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+export interface PlayerCreateFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
 }
 
-const CreatePlayerForm: React.FC<CreatePlayerFormProps> = ({ ...props }) => {
+const PlayerCreateForm: React.FC<PlayerCreateFormProps> = ({ ...props }) => {
   const [name, setName] = useState('');
   const [paid, setPaid] = useState(true);
 
@@ -45,4 +45,4 @@ const CreatePlayerForm: React.FC<CreatePlayerFormProps> = ({ ...props }) => {
   );
 };
 
-export default CreatePlayerForm;
+export default PlayerCreateForm;
