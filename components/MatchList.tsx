@@ -2,7 +2,6 @@ import { ListGroup } from 'react-bootstrap';
 import type { Match } from '../lib/matches';
 import type { Player } from '../lib/players';
 import MatchListItem from './MatchList/MatchListItem';
-import { sortBy } from 'lodash';
 
 export interface MatchListProps {
   players: Player[];

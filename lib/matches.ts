@@ -1,4 +1,4 @@
-import { Record, updateRecord } from './db';
+import { deleteRecord, Record, updateRecord } from './db';
 import { Player } from './players';
 
 export interface Match extends Record {
@@ -22,6 +22,7 @@ export const getMatches = async (eventId: string): Promise<Match[]> => {
 export type UpdateMatchInput = Pick<Match, 'winner'>;
 export const updateMatch = updateRecord<Match, UpdateMatchInput>();
 
+export const deleteMatch = deleteRecord<Match>();
 
 export const isWinner = (match: Match, player: Player): boolean => {
   return match.winner === player._id;

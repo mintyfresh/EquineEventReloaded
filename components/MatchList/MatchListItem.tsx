@@ -29,7 +29,9 @@ const MatchListItem: React.FC<MatchListItemProps> = ({ match, players, onMatchUp
       </EllipsisDropdown>
       <MatchResolutionModal
         match={match}
-        players={players}
+        players={players.filter((player) => 
+          match.players.includes(player._id)  
+        )}
         show={showResolutionModal}
         onHide={() => setShowResolutionModal(false)}
         onWinnerSelect={(match) => {

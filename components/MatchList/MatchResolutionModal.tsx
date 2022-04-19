@@ -22,7 +22,7 @@ const MatchResolutionModal: React.FC<MatchResolutionModalProps> = ({ show, onHid
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>{players[0].name} vs. {players[1].name}</Modal.Title>
+        <Modal.Title>{players[0]?.name || 'None'} vs. {players[1]?.name || 'None'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form id="match-winner-form" onSubmit={async (event) => {
