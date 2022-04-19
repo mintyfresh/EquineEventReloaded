@@ -11,7 +11,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ ...props }) => {
     <Form {...props}>
       <Row className="align-items-center">
         <Col xs="auto">
-          <Form.Label for="create-event-name" visuallyHidden>Name</Form.Label>
+          <Form.Label htmlFor="create-event-name" visuallyHidden>Name</Form.Label>
           <Form.Control
             id="create-event-name"
             title="Name"
