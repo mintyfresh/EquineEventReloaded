@@ -1,8 +1,7 @@
+import { Record, updateRecord } from './db';
 import { Player } from './players';
 
-export interface Match {
-  _id: string;
-  _rev: string;
+export interface Match extends Record {
   type: 'match';
   event: string;
   games: any[];
@@ -13,8 +12,6 @@ export interface Match {
   winner: string | null;
 };
 
-export type MatchInput = Pick<Match, 'winner'>;
-
 export const getMatches = async (eventId: string): Promise<Match[]> => {
   const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/matches?key=${JSON.stringify([eventId])}`);
   const { rows }: { rows: { value: Match }[] } = await response.json();
@@ -22,28 +19,8 @@ export const getMatches = async (eventId: string): Promise<Match[]> => {
   return rows.map((match) => match.value);
 };
 
-export const updateMatch = async (match: Match, input: Partial<MatchInput>): Promise<Match> => {
-  const payload: Omit<Match, '_rev'> = {
-    ...match,
-    ...input
-  };
-
-  const response = await fetch(`http://localhost:5984/eer/${match._id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
-
-  const { id, rev } = await response.json();
-
-  return {
-    ...payload,
-    _id: id,
-    _rev: rev
-  };
-};
+export type UpdateMatchInput = Pick<Match, 'winner'>;
+export const updateMatch = updateRecord<Match, UpdateMatchInput>();
 
 
 export const isWinner = (match: Match, player: Player): boolean => {

@@ -1,9 +1,7 @@
-import { concat, map, max, union, without } from 'lodash';
-import { v4 as uuid } from 'uuid';
+import { concat, map, max, union } from 'lodash';
+import { createRecord, deleteRecord, getRecordsByIds, Record, RecordList, updateRecord } from './db';
 
-export interface Event {
-  _id: string;
-  _rev: string;
+export interface Event extends Record {
   type: 'event';
   name: string;
   current_round: number;
@@ -12,22 +10,9 @@ export interface Event {
   eventType: string;
 }
 
-export interface EventListItem {
-  id: string;
-  value: Event;
-}
-
-export interface EventList {
-  offset: number;
-  rows: EventListItem[];
-  total_count: number;
-}
-
-export type EventInput = Pick<Event, 'name' | 'players' | 'done'>;
-
 export const listEvents = async (): Promise<Event[]> => {
   const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
-  const { rows }: EventList = await response.json();
+  const { rows }: RecordList<Event> = await response.json();
 
   return rows.map((event) => event.value);
 };
@@ -43,100 +28,33 @@ export const getEvent = async (id: string): Promise<Event> => {
   return data;
 };
 
-export const getEvents = async (ids: string[]): Promise<Event[]> => {
-  const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/events?keys=${JSON.stringify(ids)}`);
-  const { rows }: { rows: { value: Event }[] } = await response.json();
+export const getEvents = getRecordsByIds<Event>('events');
 
-  return rows.map((event) => event.value);
-};
+export type CreateEventInput = Pick<Event, 'name'> & Partial<Pick<Event, 'current_round' | 'players'>>;
+export const createEvent = createRecord<Event, CreateEventInput>('event', {
+  name: '',
+  current_round: 1,
+  players: [],
+  done: false,
+  eventType: 'swiss'
+});
 
-export const createEvent = async (input: Pick<Event, 'name'>): Promise<Event> => {
-  const payload: Omit<Event, '_rev'> = {
-    ...input,
-    _id: `event.${uuid()}`,
-    type: 'event',
-    current_round: 1,
-    players: [],
-    done: false,
-    eventType: 'swiss'
-  };
+export type UpdateEventInput = Pick<Event, 'name' | 'players' | 'done'>;
+export const updateEvent = updateRecord<Event, UpdateEventInput>();
 
-  const response = await fetch('http://localhost:5984/eer', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
+export const deleteEvent = deleteRecord<Event>();
 
-  const { id, rev } = await response.json();
-
-  return {
-    ...payload,
-    _id: id,
-    _rev: rev
-  };
-};
-
-export const updateEvent = async (event: Event, input: Partial<EventInput>): Promise<Event> => {
-  const payload: Omit<Event, '_rev'> = {
-    ...event,
-    ...input
-  };
-
-  const response = await fetch(`http://localhost:5984/eer/${event._id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
-
-  const { id, rev } = await response.json();
-
-  return {
-    ...payload,
-    _id: id,
-    _rev: rev
-  };
-};
-
-export const deleteEvent = async (event: Event): Promise<void> => {
-  await fetch(`http://localhost:5984/eer/${event._id}?rev=${event._rev}`, {
-    method: 'DELETE'
-  });
-};
-
-export const mergeEvents = async (input: Pick<Event, 'name'>, eventIds: string[]): Promise<Event> => {
+export const mergeEvents = async (input: CreateEventInput, eventIds: string[]): Promise<Event> => {
   const events = await getEvents(eventIds);
-
-  const payload: Omit<Event, '_rev'> = {
+  const newEvent = await createEvent({
     ...input,
-    _id: `event.${uuid()}`,
-    type: 'event',
     current_round: max(map(events, 'current_round')) || 1,
     players: concat(...map(events, 'players')),
-    done: false,
-    eventType: 'swiss'
-  };
-
-  const response = await fetch('http://localhost:5984/eer', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
   });
-
-  const { id, rev } = await response.json();
 
   // TODO: Duplicate matches.
 
-  return {
-    ...payload,
-    _id: id,
-    _rev: rev
-  };
+  return newEvent;
 };
 
 export const addPlayerToEvent = async (eventId: string, playerId: string): Promise<Event> => {
