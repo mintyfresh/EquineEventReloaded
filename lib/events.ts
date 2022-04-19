@@ -23,6 +23,8 @@ export interface EventList {
   total_count: number;
 }
 
+export type EventInput = Pick<Event, 'name' | 'players' | 'done'>;
+
 export const listEvents = async (): Promise<Event[]> => {
   const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
   const { rows }: EventList = await response.json();
@@ -61,6 +63,29 @@ export const createEvent = async (input: Pick<Event, 'name'>): Promise<Event> =>
 
   const response = await fetch('http://localhost:5984/eer', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const { id, rev } = await response.json();
+
+  return {
+    ...payload,
+    _id: id,
+    _rev: rev
+  };
+};
+
+export const updateEvent = async (event: Event, input: Partial<EventInput>): Promise<Event> => {
+  const payload: Omit<Event, '_rev'> = {
+    ...event,
+    ...input
+  };
+
+  const response = await fetch(`http://localhost:5984/eer/${event._id}`, {
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
@@ -116,58 +141,24 @@ export const mergeEvents = async (input: Pick<Event, 'name'>, eventIds: string[]
 
 export const addPlayerToEvent = async (eventId: string, playerId: string): Promise<Event> => {
   const oldEvent = await getEvent(eventId);
-  const newEvent = {
-    ...oldEvent,
-    players: union(oldEvent.players, [playerId])
-  };
+  const players = union(oldEvent.players, [playerId]);
 
   // Skip the update if the player is already in the event.
-  if (oldEvent.players === newEvent.players) {
+  if (oldEvent.players === players) {
     return oldEvent;
   };
 
-  const response = await fetch(`http://localhost:5984/eer`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(newEvent)
-  });
-
-  const { id, rev } = await response.json();
-
-  return {
-    ...newEvent,
-    _id: id,
-    _rev: rev
-  };
+  return updateEvent(oldEvent, { players });
 };
 
 export const removePlayerFromEvent = async (eventId: string, playerId: string): Promise<Event> => {
   const oldEvent = await getEvent(eventId);
-  const newEvent = {
-    ...oldEvent,
-    players: without(oldEvent.players, playerId)
-  };
+  const players = oldEvent.players.filter((id) => id !== playerId);
 
   // Skip the update if the player is not in the event.
-  if (oldEvent.players === newEvent.players) {
+  if (oldEvent.players === players) {
     return oldEvent;
   }
 
-  const response = await fetch(`http://localhost:5984/eer`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(newEvent)
-  });
-
-  const { id, rev } = await response.json();
-
-  return {
-    ...newEvent,
-    _id: id,
-    _rev: rev
-  };
+  return updateEvent(oldEvent, { players });
 };
