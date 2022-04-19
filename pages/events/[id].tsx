@@ -1,7 +1,8 @@
-import type { GetServerSideProps, NextPage } from 'next';
-import { Nav } from 'react-bootstrap';
-import EventNav from '../../components/EventNav';
+import type { GetServerSideProps } from 'next';
+import { ReactElement } from 'react';
+import EventLayout from '../../components/EventLayout';
 import type { Event } from '../../lib/Event';
+import type { NextPageWithLayout } from '../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<ShowEventPageProps> = async ({ params }) => {
   if (!params?.id) {
@@ -22,11 +23,9 @@ interface ShowEventPageProps {
   event: Event;
 }
 
-const ShowEventPage: NextPage<ShowEventPageProps> = ({ event }) => {
+const ShowEventPage: NextPageWithLayout<ShowEventPageProps> = ({ event }) => {
   return (
     <>
-      <h1>{event.name}</h1>
-      <EventNav event={event} />
       <dl>
         <dt>Type</dt>
         <dd>{event.eventType}</dd>
@@ -34,6 +33,14 @@ const ShowEventPage: NextPage<ShowEventPageProps> = ({ event }) => {
         <dd>{!event.done ? 'Yes' : 'No'}</dd>
       </dl>
     </>
+  );
+};
+
+ShowEventPage.getLayout = (page: ReactElement) => {
+  const { event } = page.props;
+
+  return (
+    <EventLayout event={event}>{page}</EventLayout>
   );
 };
 
