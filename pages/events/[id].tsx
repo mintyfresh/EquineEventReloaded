@@ -1,4 +1,6 @@
 import type { GetServerSideProps, NextPage } from 'next';
+import { Nav } from 'react-bootstrap';
+import ActiveLink from '../../components/ActiveLink';
 import type { Event } from '../../lib/Event';
 
 export const getServerSideProps: GetServerSideProps<ShowEventPageProps> = async ({ params }) => {
@@ -24,6 +26,23 @@ const ShowEventPage: NextPage<ShowEventPageProps> = ({ event }) => {
   return (
     <>
       <h1>{event.name}</h1>
+      <Nav variant="tabs" className="mb-3">
+        <Nav.Item>
+          <ActiveLink href="/events/[id]" as={`/events/${event._id}`} passHref>
+            <Nav.Link>Status</Nav.Link>
+          </ActiveLink>
+        </Nav.Item>
+        <Nav.Item>
+          <ActiveLink href="/events/[id]/players" as={`/events/${event._id}/players`} passHref>
+            <Nav.Link>Players</Nav.Link>
+          </ActiveLink>
+        </Nav.Item>
+        <Nav.Item>
+          <ActiveLink href="/events/[id]/matches" as={`/events/${event._id}/matches`} passHref>
+            <Nav.Link>Matches</Nav.Link>
+          </ActiveLink>
+        </Nav.Item>
+      </Nav>
       <dl>
         <dt>Type</dt>
         <dd>{event.eventType}</dd>
