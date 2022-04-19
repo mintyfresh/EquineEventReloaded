@@ -1,5 +1,5 @@
 import { Dropdown } from 'react-bootstrap';
-import type { Player } from '../../lib/players';
+import { deletePlayer, Player } from '../../lib/players';
 import EllipsisDropdown from '../EllipsisDropdown';
 
 export interface PlayerListItemProps {
@@ -8,15 +8,6 @@ export interface PlayerListItemProps {
 }
 
 const PlayerListItem: React.FC<PlayerListItemProps> = ({ player, onPlayerDelete }) => {
-  const deletePlayer = async () => {
-    if (!confirm(`Are you sure you want to delete "${player.name}"?`)) {
-      return;
-    }
-
-    // TODO: Delete player
-    await onPlayerDelete(player);
-  };
-
   return (
     <>
       {player.name}
@@ -24,7 +15,14 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({ player, onPlayerDelete 
         <Dropdown.Item>Mark unpaid</Dropdown.Item>
         <Dropdown.Item>Drop</Dropdown.Item>
         <Dropdown.Divider />
-        <Dropdown.Item className="text-danger" onClick={() => deletePlayer()}>Delete</Dropdown.Item>
+        <Dropdown.Item className="text-danger" onClick={async () => {
+          if (confirm(`Are you sure you want to delete "${player.name}"?`)) {
+            await deletePlayer(player);
+            await onPlayerDelete(player);
+          }
+        }}>
+          Delete
+        </Dropdown.Item>
       </EllipsisDropdown>
     </>
   );

@@ -44,3 +44,9 @@ export const createPlayer = async (input: Omit<Player, '_id' | '_rev' | 'type'>)
     _rev: rev
   };
 };
+
+export const deletePlayer = async (player: Player): Promise<void> => {
+  await fetch(`http://localhost:5984/eer/${player._id}?rev=${player._rev}`, {
+    method: 'DELETE'
+  });
+};
