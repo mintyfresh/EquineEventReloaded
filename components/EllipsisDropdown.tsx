@@ -12,6 +12,8 @@ const EllipsisToggle = forwardRef<HTMLAnchorElement, { onClick: (event: any) => 
   </a>
 ));
 
+EllipsisToggle.displayName = 'EllipsisToggle';
+
 export interface EllipsisDropdownProps extends React.ComponentPropsWithoutRef<typeof Dropdown> {
   children: React.ReactNode;
 }

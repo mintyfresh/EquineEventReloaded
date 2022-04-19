@@ -17,7 +17,7 @@ const MatchResolutionModal: React.FC<MatchResolutionModalProps> = ({ show, onHid
   useEffect(() => {
     // Reset winner when modal closes
     setWinner(match.winner || '');
-  }, [show]);
+  }, [match.winner, show]);
 
   return (
     <Modal show={show} onHide={onHide}>
