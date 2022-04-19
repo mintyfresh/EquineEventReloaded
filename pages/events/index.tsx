@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card } from 'react-bootstrap';
 import EventCreateForm from '../../components/EventCreateForm';
 import EventList from '../../components/EventList';
-import { EventCursor, listEvents } from '../../lib/events';
+import { Event, listEvents } from '../../lib/events';
 
 export const getServerSideProps: GetServerSideProps<IndexEventsPageProps> = async () => {
   return {
@@ -12,7 +12,7 @@ export const getServerSideProps: GetServerSideProps<IndexEventsPageProps> = asyn
 };
 
 interface IndexEventsPageProps {
-  events: EventCursor[];
+  events: Event[];
 }
 
 const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents }) => {
@@ -23,11 +23,16 @@ const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents
       <h1>Events</h1>
       <EventCreateForm
         className="mb-3"
-        onEventCreate={async (event) => {
-          setEvents([...events, { id: event._id, value: event }]);
+        onEventCreate={(event) => {
+          setEvents([...events, event]);
         }}
       />
-      <EventList events={events.map((event) => event.value)} />
+      <EventList
+        events={events}
+        onEventDelete={(event) => {
+          setEvents(events.filter((e) => e._id !== event._id));
+        }}
+      />
       {events.length === 0 && (
         <Card body className="text-center">
           <Card.Text>

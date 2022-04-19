@@ -12,16 +12,22 @@ export interface Event {
   eventType: string;
 }
 
-export interface EventCursor {
+export interface EventListItem {
   id: string;
   value: Event;
 }
 
-export const listEvents = async (): Promise<EventCursor[]> => {
-  const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
-  const { rows } = await response.json();
+export interface EventList {
+  offset: number;
+  rows: EventListItem[];
+  total_count: number;
+}
 
-  return rows;
+export const listEvents = async (): Promise<Event[]> => {
+  const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
+  const { rows }: EventList = await response.json();
+
+  return rows.map((event) => event.value);
 };
 
 export const getEvent = async (id: string): Promise<Event> => {
@@ -68,6 +74,12 @@ export const createEvent = async (input: Pick<Event, 'name'>): Promise<Event> =>
     _id: id,
     _rev: rev
   };
+};
+
+export const deleteEvent = async (event: Event): Promise<void> => {
+  await fetch(`http://localhost:5984/eer/${event._id}?rev=${event._rev}`, {
+    method: 'DELETE'
+  });
 };
 
 export const mergeEvents = async (input: Pick<Event, 'name'>, eventIds: string[]): Promise<Event> => {
