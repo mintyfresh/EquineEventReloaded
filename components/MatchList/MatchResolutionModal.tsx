@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { Match, updateMatch } from '../../lib/matches';
+import { Match, TIE, updateMatch } from '../../lib/matches';
 import type { Player } from '../../lib/players';
 
 export interface MatchResolutionModalProps {
@@ -46,7 +46,7 @@ const MatchResolutionModal: React.FC<MatchResolutionModalProps> = ({ show, onHid
                 Player: {player.name}
               </option>
             ))}
-            <option value="tie">Tie</option>
+            <option value={TIE}>Tie</option>
           </Form.Select>
         </Form>
       </Modal.Body>

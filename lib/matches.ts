@@ -12,6 +12,8 @@ export interface Match extends Record {
   winner: string | null;
 };
 
+export const TIE = 'tie';
+
 export const getMatches = async (eventId: string): Promise<Match[]> => {
   const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/matches?key=${JSON.stringify([eventId])}`);
   const { rows }: { rows: { value: Match }[] } = await response.json();
@@ -29,9 +31,9 @@ export const isWinner = (match: Match, player: Player): boolean => {
 }
 
 export const isTie = (match: Match): boolean => {
-  return match.winner === 'tie';
+  return match.winner === TIE;
 };
 
 export const isLoser = (match: Match, player: Player): boolean => {
-  return !!match.winner && match.winner !== player._id && match.winner !== 'tie';
+  return !!match.winner && match.winner !== player._id && match.winner !== TIE;
 }
