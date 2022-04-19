@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { ListGroup } from 'react-bootstrap';
 import type { Event } from '../lib/events';
+import EventListItem from './EventList/EventListItem';
 
 export interface EventListProps {
   events: Event[];
@@ -11,9 +11,7 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     <ListGroup>
       {events.map((event) => (
         <ListGroup.Item key={event._id}>
-          <Link href="/events/[id]" as={`/events/${event._id}`}>
-            {event.name}
-          </Link>
+          <EventListItem event={event} />
         </ListGroup.Item>
       ))}
     </ListGroup>
