@@ -1,15 +1,26 @@
 import { useState } from 'react';
 import { Button, Col, Form, Row, ToggleButton } from 'react-bootstrap';
+import { createPlayer, Player } from '../lib/players';
 
 export interface PlayerCreateFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+  onPlayerCreate: (player: Player) => (void | Promise<void>);
 }
 
-const PlayerCreateForm: React.FC<PlayerCreateFormProps> = ({ ...props }) => {
+const PlayerCreateForm: React.FC<PlayerCreateFormProps> = ({ onPlayerCreate, ...props }) => {
   const [name, setName] = useState('');
   const [paid, setPaid] = useState(true);
 
   return (
-    <Form {...props}>
+    <Form {...props} onSubmit={async (event) => {
+      event.preventDefault();
+      const player = await createPlayer({ name, paid });
+
+      await onPlayerCreate(player);
+
+      // Reset inputs.
+      setName('');
+      setPaid(true);
+    }}>
       <Row className="align-items-center">
         <Col xs="auto">
           <Form.Label htmlFor="create-player-name" visuallyHidden>

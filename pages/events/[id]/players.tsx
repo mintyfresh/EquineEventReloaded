@@ -1,10 +1,10 @@
 import type { GetServerSideProps } from 'next';
-import type { ReactElement } from 'react';
-import PlayerCreateForm from '../../../components/PlayerCreateForm';
+import { ReactElement, useState } from 'react';
 import EventLayout from '../../../components/EventLayout';
+import PlayerCreateForm from '../../../components/PlayerCreateForm';
 import PlayerList from '../../../components/PlayerList';
-import { Event, getEvent } from '../../../lib/events';
-import { getPlayers, PlayerCursor } from '../../../lib/players';
+import { addPlayerToEvent, Event, getEvent } from '../../../lib/events';
+import { getPlayers, Player } from '../../../lib/players';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventPlayersPageProps> = async ({ params }) => {
@@ -24,14 +24,25 @@ export const getServerSideProps: GetServerSideProps<EventPlayersPageProps> = asy
 
 interface EventPlayersPageProps {
   event: Event;
-  players: PlayerCursor[];
+  players: Player[];
 };
 
-const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ players }) => {
+const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ event: initialEvent, players: initialPlayers }) => {
+  const [event, setEvent] = useState(initialEvent);
+  const [players, setPlayers] = useState(initialPlayers);
+
   return (
     <>
-      <PlayerCreateForm className="mb-3" />
-      <PlayerList players={players.map((player) => player.value)} />
+      <PlayerCreateForm
+        className="mb-3"
+        onPlayerCreate={async (player) => {
+          const newEvent = await addPlayerToEvent(event._id, player._id);
+
+          setEvent(newEvent);
+          setPlayers([...players, player]);
+        }}
+      />
+      <PlayerList players={players} />
     </>
   );
 };

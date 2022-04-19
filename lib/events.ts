@@ -26,3 +26,27 @@ export const getEvent = async (id: string | number): Promise<Event> => {
 
   return await response.json();
 };
+
+export const addPlayerToEvent = async (eventId: string, playerId: string): Promise<Event> => {
+  const oldEvent = await getEvent(eventId);
+  const newEvent = {
+    ...oldEvent,
+    players: [...oldEvent.players, playerId]
+  };
+
+  const response = await fetch(`http://localhost:5984/eer`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newEvent)
+  });
+
+  const { id, rev } = await response.json();
+
+  return {
+    ...newEvent,
+    _id: id,
+    _rev: rev
+  };
+};
