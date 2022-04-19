@@ -24,6 +24,11 @@ const EventNav: React.FC<EventNavProps> = ({ event }) => {
           <Nav.Link>Matches</Nav.Link>
         </ActiveLink>
       </Nav.Item>
+      <Nav.Item>
+        <ActiveLink href="/events/[id]/slips" as={`/events/${event._id}/slips`} passHref>
+          <Nav.Link>Slips</Nav.Link>
+        </ActiveLink>
+      </Nav.Item>
     </Nav>
   );
 };
