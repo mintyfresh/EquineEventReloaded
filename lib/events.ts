@@ -16,8 +16,9 @@ export interface EventCursor {
 
 export const listEvents = async (): Promise<EventCursor[]> => {
   const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
+  const { rows } = await response.json();
 
-  return await response.json();
+  return rows;
 };
 
 export const getEvent = async (id: string | number): Promise<Event> => {

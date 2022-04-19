@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, ButtonGroup, Col, Form, Row, ToggleButton } from 'react-bootstrap';
+import { Button, Col, Form, Row, ToggleButton } from 'react-bootstrap';
 
 export interface CreatePlayerFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
 }
