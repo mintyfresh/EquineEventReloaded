@@ -6,7 +6,7 @@ import EventLayout from '../../../components/EventLayout';
 import Slip from '../../../components/Slip';
 import { Event, getEvent } from '../../../lib/events';
 import { getMatches, Match } from '../../../lib/matches';
-import { getPlayers, Player } from '../../../lib/players';
+import { getRankedPlayers, RankedPlayer } from '../../../lib/rankings';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async ({ params }) => {
@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async
   }
 
   const event = await getEvent(params.id as string);
-  const players = await getPlayers(event.players);
+  const players = await getRankedPlayers(event);
   const matches = sortBy(await getMatches(event._id), 'table');
 
   return {
@@ -27,7 +27,7 @@ export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async
 
 interface EventSlipsPageProps {
   event: Event;
-  players: Player[];
+  players: RankedPlayer[];
   matches: Match[];
 }
 
@@ -39,7 +39,7 @@ const EventSlipsPage: NextPageWithLayout<EventSlipsPageProps> = ({ event, player
         <Slip
           key={match._id}
           event={event}
-          players={players}
+          players={players.filter((player) => match.players.includes(player._id))}
           match={match}
         />
       ))}

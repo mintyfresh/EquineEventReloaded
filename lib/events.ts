@@ -26,8 +26,13 @@ export const listEvents = async (): Promise<EventCursor[]> => {
 
 export const getEvent = async (id: string): Promise<Event> => {
   const response = await fetch(`http://localhost:5984/eer/${id}`);
+  const data = await response.json();
 
-  return await response.json();
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
+  return data;
 };
 
 export const getEvents = async (ids: string[]): Promise<Event[]> => {
