@@ -2,9 +2,9 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { Card } from 'react-bootstrap';
 import CreateEventForm from '../../components/CreateEventForm';
 import EventList from '../../components/EventList';
-import { Event } from '../../lib/Event';
+import type { EventCursor } from '../../lib/Event';
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps<IndexEventsPageProps> = async () => {
   const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
   const { rows } = await response.json();
 
@@ -13,12 +13,16 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 
-const EventsIndexPage: NextPage<{ events: Event[] }> = ({ events }) => {
+interface IndexEventsPageProps {
+  events: EventCursor[];
+}
+
+const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events }) => {
   return (
     <>
       <h1>Events</h1>
       <CreateEventForm className="mb-3" />
-      <EventList events={events} />
+      <EventList events={events.map((event) => event.value)} />
       {events.length === 0 && (
         <Card body className="text-center">
           <Card.Text>
@@ -30,4 +34,4 @@ const EventsIndexPage: NextPage<{ events: Event[] }> = ({ events }) => {
   );
 };
 
-export default EventsIndexPage;
+export default IndexEventsPage;
