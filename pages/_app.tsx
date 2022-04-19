@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
+import { SSRProvider } from 'react-bootstrap';
 import Layout from '../components/Layout';
 
 type NextPageWithLayout = NextPage & {
@@ -18,7 +19,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   ));
 
   return (
-    getLayout(<Component {...pageProps} />)
+    <SSRProvider>
+      {getLayout(<Component {...pageProps} />)}
+    </SSRProvider>
   );
 }
 
