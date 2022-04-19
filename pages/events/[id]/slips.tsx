@@ -1,3 +1,4 @@
+import { sortBy } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
 import { Card } from 'react-bootstrap';
@@ -17,7 +18,7 @@ export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async
 
   const event = await getEvent(params.id as string);
   const players = await getPlayers(event.players);
-  const matches = await getMatches(event._id);
+  const matches = sortBy(await getMatches(event._id), 'table');
 
   return {
     props: { event, players, matches }
