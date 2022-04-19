@@ -1,6 +1,6 @@
 import { sortBy } from 'lodash';
 import type { GetServerSideProps } from 'next';
-import type { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import { Button, ButtonToolbar, Card, Col, Form, Row } from 'react-bootstrap';
 import EventLayout from '../../../components/EventLayout';
 import MatchList from '../../../components/MatchList';
@@ -31,10 +31,15 @@ interface EventMatchesPageProps {
   matches: Match[];
 }
 
-const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ players, matches }) => {
+const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ players, matches: initialMatches }) => {
+  const [matches, setMatches] = useState(initialMatches);
+
+  const onMatchUpdate = (match: Match) => {
+    setMatches(matches.map((m) => m._id === match._id ? match : m));
+  };
+
   return (
     <>
-      <h2>Matches</h2>
       <Row className="mb-3">
         <Col xs="auto">
           <Form.Select>
@@ -51,7 +56,11 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ players, 
           </ButtonToolbar>
         </Col>
       </Row>
-      <MatchList players={players} matches={matches} />
+      <MatchList
+        players={players}
+        matches={matches}
+        onMatchUpdate={onMatchUpdate}
+      />
       {matches.length === 0 && (
         <Card body className="text-center">
           <Card.Text>

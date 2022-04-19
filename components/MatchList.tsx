@@ -7,14 +7,19 @@ import { sortBy } from 'lodash';
 export interface MatchListProps {
   players: Player[];
   matches: Match[];
+  onMatchUpdate: (match: Match) => (void | Promise<void>);
 }
 
-const MatchList: React.FC<MatchListProps> = ({ players, matches }) => { 
+const MatchList: React.FC<MatchListProps> = ({ players, matches, onMatchUpdate }) => { 
   return (
     <ListGroup>
       {matches.map((match) => (
         <ListGroup.Item key={match._id}>
-          <MatchListItem match={match} players={players} />
+          <MatchListItem
+            match={match}
+            players={players}
+            onMatchUpdate={onMatchUpdate}
+          />
         </ListGroup.Item>
       ))}
     </ListGroup>
