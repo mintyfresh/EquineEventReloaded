@@ -1,4 +1,3 @@
-import { without } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
 import { Card } from 'react-bootstrap';
@@ -33,25 +32,34 @@ const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ event: in
   const [event, setEvent] = useState(initialEvent);
   const [players, setPlayers] = useState(initialPlayers);
 
+  const onPlayerCreate = async (player: Player) => {
+    const updatedEvent = await addPlayerToEvent(event._id, player._id);
+
+    setEvent(updatedEvent);
+    setPlayers([...players, player]);
+  };
+
+  const onPlayerUpdate = async (player: Player) => {
+    setPlayers(players.map((p) => p._id === player._id ? player : p));
+  };
+
+  const onPlayerDelete = async (player: Player) => {
+    const updatedEvent = await removePlayerFromEvent(event._id, player._id);
+          
+    setEvent(updatedEvent);
+    setPlayers(players.filter((p) => p._id !== player._id));
+  };
+
   return (
     <>
       <PlayerCreateForm
         className="mb-3"
-        onPlayerCreate={async (player) => {
-          const updatedEvent = await addPlayerToEvent(event._id, player._id);
-
-          setEvent(updatedEvent);
-          setPlayers([...players, player]);
-        }}
+        onPlayerCreate={onPlayerCreate}
       />
       <PlayerList
         players={players}
-        onPlayerDelete={async (player) => {
-          const updatedEvent = await removePlayerFromEvent(event._id, player._id);
-          
-          setEvent(updatedEvent);
-          setPlayers(without(players, player));
-        }}
+        onPlayerUpdate={onPlayerUpdate}
+        onPlayerDelete={onPlayerDelete}
       />
       {players.length === 0 && (
         <Card body className="text-center">

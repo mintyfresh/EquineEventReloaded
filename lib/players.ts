@@ -14,6 +14,8 @@ export interface PlayerCursor {
   value: Player;
 }
 
+export type PlayerInput = Pick<Player, 'name' | 'paid' | 'dropped'>;
+
 export const getPlayers = async (ids: string[]): Promise<Player[]> => {
   const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/players?keys=${JSON.stringify(ids)}`);
   const { rows }: { rows: PlayerCursor[] } = await response.json();
@@ -21,7 +23,7 @@ export const getPlayers = async (ids: string[]): Promise<Player[]> => {
   return rows.map((player) => player.value);
 };
 
-export const createPlayer = async (input: Omit<Player, '_id' | '_rev' | 'type'>): Promise<Player> => {
+export const createPlayer = async (input: PlayerInput): Promise<Player> => {
   const player: Omit<Player, '_rev'> = {
     ...input,
     _id: `player.${uuid()}`,
@@ -40,6 +42,29 @@ export const createPlayer = async (input: Omit<Player, '_id' | '_rev' | 'type'>)
 
   return {
     ...player,
+    _id: id,
+    _rev: rev
+  };
+};
+
+export const updatePlayer = async (player: Player, input: Partial<PlayerInput>): Promise<Player> => {
+  const payload: Omit<Player, '_rev'> = {
+    ...player,
+    ...input
+  };
+
+  const response = await fetch(`http://localhost:5984/eer/${player._id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const { id, rev } = await response.json();
+
+  return {
+    ...payload,
     _id: id,
     _rev: rev
   };
