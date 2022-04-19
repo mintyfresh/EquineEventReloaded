@@ -1,6 +1,7 @@
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
 import { ListGroup } from 'react-bootstrap';
+import CreatePlayerForm from '../../../components/CreatePlayerForm';
 import EventLayout from '../../../components/EventLayout';
 import { Event, getEvent } from '../../../lib/events';
 import { getPlayers, PlayerCursor } from '../../../lib/players';
@@ -29,6 +30,7 @@ interface EventPlayersPageProps {
 const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ players }) => {
   return (
     <>
+      <CreatePlayerForm className="mb-3" />
       <ListGroup>
         {players.map((player) => (
           <ListGroup.Item key={player.id}>
