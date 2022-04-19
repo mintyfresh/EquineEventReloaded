@@ -1,5 +1,6 @@
 import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
+import { Card } from 'react-bootstrap';
 import EventLayout from '../../../components/EventLayout';
 import PlayerCreateForm from '../../../components/PlayerCreateForm';
 import PlayerList from '../../../components/PlayerList';
@@ -43,6 +44,13 @@ const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ event: in
         }}
       />
       <PlayerList players={players} />
+      {players.length === 0 && (
+        <Card body className="text-center">
+          <Card.Text>
+            No players yet.
+          </Card.Text>
+        </Card>
+      )}
     </>
   );
 };

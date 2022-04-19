@@ -1,4 +1,5 @@
 import type { GetServerSideProps, NextPage } from 'next';
+import { useState } from 'react';
 import { Card } from 'react-bootstrap';
 import EventCreateForm from '../../components/EventCreateForm';
 import EventList from '../../components/EventList';
@@ -14,11 +15,18 @@ interface IndexEventsPageProps {
   events: EventCursor[];
 }
 
-const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events }) => {
+const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents }) => {
+  const [events, setEvents] = useState(initialEvents);
+
   return (
     <>
       <h1>Events</h1>
-      <EventCreateForm className="mb-3" />
+      <EventCreateForm
+        className="mb-3"
+        onEventCreate={async (event) => {
+          setEvents([...events, { id: event._id, value: event }]);
+        }}
+      />
       <EventList events={events.map((event) => event.value)} />
       {events.length === 0 && (
         <Card body className="text-center">

@@ -1,14 +1,24 @@
 import { useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
+import { createEvent, Event } from '../lib/events';
 
 export interface EventCreateFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+  onEventCreate: (event: Event) => (void | Promise<void>);
 }
 
-const EventCreateForm: React.FC<EventCreateFormProps> = ({ ...props }) => {
+const EventCreateForm: React.FC<EventCreateFormProps> = ({ onEventCreate, ...props }) => {
   const [name, setName] = useState('');
 
   return (
-    <Form {...props}>
+    <Form {...props} onSubmit={async (event) => {
+      event.preventDefault();
+      const newEvent = await createEvent({ name });
+
+      await onEventCreate(newEvent);
+
+      // Reset inputs.
+      setName('');
+    }}>
       <Row className="align-items-center">
         <Col xs="auto">
           <Form.Label htmlFor="create-event-name" visuallyHidden>Name</Form.Label>
