@@ -1,8 +1,9 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import { useState } from 'react';
-import { Card } from 'react-bootstrap';
+import { Button, Card, Col, Row } from 'react-bootstrap';
 import EventCreateForm from '../../components/EventCreateForm';
 import EventList from '../../components/EventList';
+import EventMergeModal from '../../components/EventMergeModal';
 import { Event, listEvents } from '../../lib/events';
 
 export const getServerSideProps: GetServerSideProps<IndexEventsPageProps> = async () => {
@@ -17,16 +18,26 @@ interface IndexEventsPageProps {
 
 const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents }) => {
   const [events, setEvents] = useState(initialEvents);
+  const [showMergeModal, setShowMergeModal] = useState(false);
 
   return (
     <>
       <h1>Events</h1>
-      <EventCreateForm
-        className="mb-3"
-        onEventCreate={(event) => {
-          setEvents([...events, event]);
-        }}
-      />
+      <Row>
+        <Col xs="auto">
+          <EventCreateForm
+            className="mb-3"
+            onEventCreate={(event) => {
+              setEvents([...events, event]);
+            }}
+          />
+        </Col>
+        <Col xs="auto" className="ms-auto">
+          <Button variant="outline-secondary" onClick={() => setShowMergeModal(true)} className="float-end">
+            Merge Events
+          </Button>
+        </Col>
+      </Row>
       <EventList
         events={events}
         onEventDelete={(event) => {
@@ -40,6 +51,15 @@ const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents
           </Card.Text>
         </Card>
       )}
+      <EventMergeModal
+        events={events}
+        onEventsMerge={(newEvent) => {
+          setShowMergeModal(false);
+          setEvents([...events, newEvent]);
+        }}
+        show={showMergeModal}
+        onHide={() => setShowMergeModal(false)}
+      />
     </>
   );
 };

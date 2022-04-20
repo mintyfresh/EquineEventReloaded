@@ -1,4 +1,5 @@
-import { deleteRecord, Record, updateRecord } from './db';
+import { createRecord, deleteRecord, generateRecordID, Record, RecordList, updateRecord } from './db';
+import { Event } from './events';
 import { Player } from './players';
 
 export interface Match extends Record {
@@ -14,12 +15,24 @@ export interface Match extends Record {
 
 export const TIE = 'tie';
 
-export const getMatches = async (eventId: string): Promise<Match[]> => {
-  const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/matches?key=${JSON.stringify([eventId])}`);
-  const { rows }: { rows: { value: Match }[] } = await response.json();
+export const getMatches = async (eventId: string[] | string): Promise<Match[]> => {
+  const key = Array.isArray(eventId) ? eventId : [eventId];
+  const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/matches?key=${JSON.stringify(key)}`);
+  const { rows }: RecordList<Match> = await response.json();
 
   return rows.map((match) => match.value);
 };
+
+export type CreateMatchInput = Pick<Match, 'event'> & Partial<Pick<Match, 'games' | 'players' | 'rank' | 'round' | 'winner'>>;
+export const createMatch = createRecord<Match, CreateMatchInput>('match', {
+  event: '',
+  games: [],
+  players: [],
+  rank: [],
+  round: 1,
+  table: 1,
+  winner: null
+});
 
 export type UpdateMatchInput = Pick<Match, 'winner'>;
 export const updateMatch = updateRecord<Match, UpdateMatchInput>();

@@ -18,22 +18,43 @@ export interface RecordList<T extends Record> {
   total_count: number;
 }
 
-export const getRecordsByIds = <T extends Record>(view: string) => {
+export const getRecordsByIDs = <T extends Record>() => {
   return async (ids: string[]): Promise<T[]> => {
-    const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/${view}?keys=${JSON.stringify(ids)}`);
+    const docs = ids.map((id) => ({ id }));
+    const response = await fetch(`http://localhost:5984/eer/_bulk_get`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ docs })
+    });
+
+    const { results } = await response.json();
+
+    return results.map((result: any) => result.docs[0].ok)
+      .filter((doc: any) => doc);
+  };
+};
+
+export const getRecordsByKeys = <T extends Record>(view: string) => {
+  return async (keys: string[]): Promise<T[]> => {
+    const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/${view}?keys=${JSON.stringify(keys)}`);
     const { rows }: RecordList<T> = await response.json();
 
     return rows.map((record) => record.value);
   };
 };
 
+export const generateRecordID = <T extends Record>(type: T['type']): string => (
+  `${type}.${uuid()}`
+);
+
 export const createRecord = <T extends Record, TInput, TDefaults = Omit<T, '_id' | '_rev' | 'type'>>(type: string, defaults: TDefaults) => {
   return async (input: TInput): Promise<Pick<T, '_id' | '_rev' | 'type'> & TDefaults & TInput> => {
     const payload: Pick<T, '_id' | 'type'> & TDefaults & TInput = {
       ...defaults,
-      _id: `${type}.${uuid()}` as string,
+      _id: generateRecordID<T>(type),
       type: type,
-      ...input
+      ...input,
+      _rev: undefined
     };
 
     const response = await fetch(`http://localhost:5984/eer`, {

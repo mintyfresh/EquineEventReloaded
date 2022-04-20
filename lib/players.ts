@@ -1,4 +1,4 @@
-import { createRecord, deleteRecord, getRecordsByIds, Record, updateRecord } from './db';
+import { createRecord, deleteRecord, getRecordsByKeys, Record, updateRecord } from './db';
 
 export interface Player extends Record {
   type: 'player';
@@ -7,7 +7,7 @@ export interface Player extends Record {
   dropped?: boolean;
 }
 
-export const getPlayers = getRecordsByIds<Player>('players');
+export const getPlayers = getRecordsByKeys<Player>('players');
 
 export type CreatePlayerInput = Pick<Player, 'name' | 'paid'>;
 export const createPlayer = createRecord<Player, CreatePlayerInput>('player', {

@@ -1,5 +1,6 @@
 import { concat, map, max, union } from 'lodash';
-import { createRecord, deleteRecord, getRecordsByIds, Record, RecordList, updateRecord } from './db';
+import { createRecord, deleteRecord, getRecordsByIDs, getRecordsByKeys, Record, RecordList, updateRecord } from './db';
+import { createMatch, getMatches } from './matches';
 
 export interface Event extends Record {
   type: 'event';
@@ -28,7 +29,7 @@ export const getEvent = async (id: string): Promise<Event> => {
   return data;
 };
 
-export const getEvents = getRecordsByIds<Event>('events');
+export const getEvents = getRecordsByIDs<Event>();
 
 export type CreateEventInput = Pick<Event, 'name'> & Partial<Pick<Event, 'current_round' | 'players'>>;
 export const createEvent = createRecord<Event, CreateEventInput>('event', {
@@ -46,13 +47,24 @@ export const deleteEvent = deleteRecord<Event>();
 
 export const mergeEvents = async (input: CreateEventInput, eventIds: string[]): Promise<Event> => {
   const events = await getEvents(eventIds);
+  const matches = await getMatches(eventIds);
+
   const newEvent = await createEvent({
     ...input,
     current_round: max(map(events, 'current_round')) || 1,
-    players: concat(...map(events, 'players')),
+    players: [...events.flatMap((event) => event.players)],
   });
 
-  // TODO: Duplicate matches.
+  await Promise.all(
+    // TODO: Perform a bulk operation.
+    matches.map((match) => createMatch({
+      ...match,
+      event: newEvent._id,
+      games: [...match.games],
+      players: [...match.players],
+      rank: [...match.rank]
+    }))
+  );
 
   return newEvent;
 };

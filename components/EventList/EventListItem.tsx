@@ -15,10 +15,6 @@ const EventListItem: React.FC<EventListItemProps> = ({ event, onEventDelete }) =
         {event.name}
       </Link>
       <EllipsisDropdown className="float-end">
-        <Dropdown.Item>
-          Merge with...
-        </Dropdown.Item>
-        <Dropdown.Divider />
         <Dropdown.Item className="text-danger" onClick={async () => {
           if (confirm(`Are you sure you want to delete "${event.name}"?`)) {
             await deleteEvent(event);
