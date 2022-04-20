@@ -1,5 +1,4 @@
-import { createRecord, deleteRecord, generateRecordID, getRecordsByKey, Record, RecordList, updateRecord } from './db';
-import { Event } from './events';
+import { createRecord, deleteRecord, getRecordsByKey, Record, updateRecord } from './db';
 import { Player } from './players';
 
 export interface Match extends Record {

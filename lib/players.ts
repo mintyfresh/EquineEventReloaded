@@ -1,4 +1,4 @@
-import { createRecord, deleteRecord, getRecordsByIDs, getRecordsByKey, Record, updateRecord } from './db';
+import { createRecord, deleteRecord, getRecordsByIDs, Record, updateRecord } from './db';
 
 export interface Player extends Record {
   type: 'player';
