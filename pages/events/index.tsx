@@ -1,14 +1,16 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import { useState } from 'react';
 import { Button, Card, Col, Row } from 'react-bootstrap';
+import { Client } from '../../api/client';
+import { Server } from '../../api/server';
+import type { CreateEventInput, Event } from '../../api/types';
 import EventCreateForm from '../../components/EventCreateForm';
 import EventList from '../../components/EventList';
 import EventMergeModal from '../../components/EventMergeModal';
-import { Event, listEvents } from '../../lib/events';
 
 export const getServerSideProps: GetServerSideProps<IndexEventsPageProps> = async () => {
   return {
-    props: { events: await listEvents() },
+    props: await Server.listEvents(),
   };
 };
 
@@ -20,6 +22,18 @@ const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents
   const [events, setEvents] = useState(initialEvents);
   const [showMergeModal, setShowMergeModal] = useState(false);
 
+  const onEventCreate = async (input: CreateEventInput) => {
+    const { event } = await Client.createEvent(input);
+
+    setEvents([...events, event]);
+  };
+
+  const onEventDelete = async (event: Event) => {
+    await Client.deleteEvent(event.id);
+
+    setEvents(events.filter((e) => e.id !== event.id));
+  };
+
   return (
     <>
       <h1>Events</h1>
@@ -27,9 +41,7 @@ const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents
         <Col xs="auto">
           <EventCreateForm
             className="mb-3"
-            onEventCreate={(event) => {
-              setEvents([...events, event]);
-            }}
+            onEventCreate={onEventCreate}
           />
         </Col>
         <Col xs="auto" className="ms-auto">
@@ -40,9 +52,7 @@ const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents
       </Row>
       <EventList
         events={events}
-        onEventDelete={(event) => {
-          setEvents(events.filter((e) => e._id !== event._id));
-        }}
+        onEventDelete={onEventDelete}
       />
       {events.length === 0 && (
         <Card body className="text-center">
@@ -55,7 +65,7 @@ const IndexEventsPage: NextPage<IndexEventsPageProps> = ({ events: initialEvents
         events={events}
         onEventsMerge={(newEvent) => {
           setShowMergeModal(false);
-          setEvents([...events, newEvent]);
+          // setEvents([...events, newEvent]);
         }}
         show={showMergeModal}
         onHide={() => setShowMergeModal(false)}

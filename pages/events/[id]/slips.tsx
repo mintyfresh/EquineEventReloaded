@@ -2,11 +2,13 @@ import { sortBy } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
 import { Card } from 'react-bootstrap';
+import { Server } from '../../../api/server';
+import { Event, Match } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import Slip from '../../../components/Slip';
-import { Event, getEvent } from '../../../lib/events';
-import { getMatchesByEvent, Match } from '../../../lib/matches';
-import { getRankedPlayers, RankedPlayer } from '../../../lib/rankings';
+import { EventRecord, getEvent } from '../../../lib/db/events';
+import { getMatchesByEvent, MatchRecord } from '../../../lib/db/matches';
+import { getRankedPlayers, RankedPlayer } from '../../../lib/db/rankings';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async ({ params }) => {
@@ -16,30 +18,27 @@ export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async
     };
   }
 
-  const event = await getEvent(params.id as string);
-  const players = await getRankedPlayers(event);
-  const matches = sortBy(await getMatchesByEvent(event._id), 'table');
+  const { event } = await Server.getEvent(params.id as string);
+  const { matches } = await Server.listEventMatches(params.id as string);
 
   return {
-    props: { event, players, matches }
+    props: { event, matches }
   };
 };
 
 interface EventSlipsPageProps {
   event: Event;
-  players: RankedPlayer[];
   matches: Match[];
 }
 
-const EventSlipsPage: NextPageWithLayout<EventSlipsPageProps> = ({ event, players, matches }) => {
+const EventSlipsPage: NextPageWithLayout<EventSlipsPageProps> = ({ event, matches }) => {
   return (
     <>
       <h2>Slips</h2>
       {matches.map((match) => (
         <Slip
-          key={match._id}
+          key={match.id}
           event={event}
-          players={players.filter((player) => match.players.includes(player._id))}
           match={match}
         />
       ))}

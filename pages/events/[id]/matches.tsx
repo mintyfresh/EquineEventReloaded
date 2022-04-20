@@ -1,12 +1,11 @@
-import { sortBy } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
 import { Button, ButtonToolbar, Card, Col, Form, Row } from 'react-bootstrap';
+import { Client } from '../../../api/client';
+import { Server } from '../../../api/server';
+import type { Event, Match, UpdateEventMatchInput } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import MatchList from '../../../components/MatchList';
-import { Event, getEvent } from '../../../lib/events';
-import { getMatchesByEvent, Match } from '../../../lib/matches';
-import { getPlayers, Player } from '../../../lib/players';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventMatchesPageProps> = async ({ params }) => {
@@ -16,26 +15,32 @@ export const getServerSideProps: GetServerSideProps<EventMatchesPageProps> = asy
     };
   }
 
-  const event = await getEvent(params.id as string);
-  const players = await getPlayers(event.players);
-  const matches = sortBy(await getMatchesByEvent(event._id), 'table');
+  const { event } = await Server.getEvent(params.id as string);
+  const { matches } = await Server.listEventMatches(params.id as string);
 
   return {
-    props: { event, players, matches }
+    props: { event, matches }
   };
 };
 
 interface EventMatchesPageProps {
   event: Event;
-  players: Player[];
   matches: Match[];
 }
 
-const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ players, matches: initialMatches }) => {
+const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event, matches: initialMatches }) => {
   const [matches, setMatches] = useState(initialMatches);
 
-  const onMatchUpdate = (match: Match) => {
-    setMatches(matches.map((m) => m._id === match._id ? match : m));
+  const onMatchUpdate = async (match: Match, input: UpdateEventMatchInput) => {
+    const { match: updatedMatch } = await Client.updateEventMatch(event.id, match.id, input);
+
+    setMatches(matches.map((m) => m.id === match.id ? updatedMatch : m));
+  };
+
+  const onMatchDelete = async (match: Match) => {
+    await Client.deleteEventMatch(event.id, match.id);
+
+    setMatches(matches.filter((m) => m.id !== match.id));
   };
 
   return (
@@ -57,9 +62,9 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ players, 
         </Col>
       </Row>
       <MatchList
-        players={players}
         matches={matches}
         onMatchUpdate={onMatchUpdate}
+        onMatchDelete={onMatchDelete}
       />
       {matches.length === 0 && (
         <Card body className="text-center">

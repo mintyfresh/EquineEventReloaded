@@ -1,17 +1,17 @@
+import { isNull } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { Match, TIE, updateMatch } from '../../lib/matches';
-import type { Player } from '../../lib/players';
+import type { Match, Player, UpdateEventMatchInput } from '../../api/types';
+import { TIE } from '../../lib/db/matches';
 
 export interface MatchResolutionModalProps {
   show: boolean;
   onHide: () => void;
   match: Match;
-  players: Player[];
-  onWinnerSelect: (match: Match) => (void | Promise<void>);
+  onWinnerSelect: (match: Match, input: UpdateEventMatchInput) => (void | Promise<void>);
 }
 
-const MatchResolutionModal: React.FC<MatchResolutionModalProps> = ({ show, onHide, match, players, onWinnerSelect }) => {
+const MatchResolutionModal: React.FC<MatchResolutionModalProps> = ({ show, onHide, match, onWinnerSelect }) => {
   const [winner, setWinner] = useState(match.winner || '');
 
   useEffect(() => {
@@ -22,17 +22,12 @@ const MatchResolutionModal: React.FC<MatchResolutionModalProps> = ({ show, onHid
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>{players[0]?.name || 'None'} vs. {players[1]?.name || 'None'}</Modal.Title>
+        <Modal.Title>{match.players[0]?.name || 'None'} vs. {match.players[1]?.name || 'None'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form id="match-winner-form" onSubmit={async (event) => {
           event.preventDefault();
-
-          const updatedMatch = await updateMatch(match, {
-            winner: winner === '' ? null : winner
-          });
-
-          await onWinnerSelect(updatedMatch);
+          await onWinnerSelect(match, { winner });
         }}>
           <Form.Label>Winner</Form.Label>
           <Form.Select
@@ -41,8 +36,8 @@ const MatchResolutionModal: React.FC<MatchResolutionModalProps> = ({ show, onHid
             onChange={(event) => setWinner(event.currentTarget.value)}
           >
             <option>None</option>
-            {players.map((player) => (
-              <option key={player._id} value={player._id}>
+            {match.players.map((player) => (
+              player && <option key={player.id} value={player.id}>
                 Player: {player.name}
               </option>
             ))}

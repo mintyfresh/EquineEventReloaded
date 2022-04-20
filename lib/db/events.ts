@@ -1,8 +1,8 @@
-import { concat, map, max, union } from 'lodash';
-import { createRecord, deleteRecord, getRecordsByIDs, getRecordsByKey, Record, RecordList, updateRecord } from './db';
+import { map, max, union } from 'lodash';
+import { createRecord, deleteRecord, getRecordsByIDs, Record, RecordList, updateRecord } from './records';
 import { createMatch, getMatchesByEvent } from './matches';
 
-export interface Event extends Record {
+export interface EventRecord extends Record {
   type: 'event';
   name: string;
   current_round: number;
@@ -11,14 +11,14 @@ export interface Event extends Record {
   eventType: string;
 }
 
-export const listEvents = async (): Promise<Event[]> => {
+export const listEvents = async (): Promise<EventRecord[]> => {
   const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
-  const { rows }: RecordList<Event> = await response.json();
+  const { rows }: RecordList<EventRecord> = await response.json();
 
   return rows.map((event) => event.value);
 };
 
-export const getEvent = async (id: string): Promise<Event> => {
+export const getEvent = async (id: string): Promise<EventRecord> => {
   const response = await fetch(`http://localhost:5984/eer/${id}`);
   const data = await response.json();
 
@@ -29,10 +29,10 @@ export const getEvent = async (id: string): Promise<Event> => {
   return data;
 };
 
-export const getEvents = getRecordsByIDs<Event>();
+export const getEvents = getRecordsByIDs<EventRecord>();
 
-export type CreateEventInput = Pick<Event, 'name'> & Partial<Pick<Event, 'current_round' | 'players'>>;
-export const createEvent = createRecord<Event, CreateEventInput>('event', {
+export type CreateEventInput = Pick<EventRecord, 'name'> & Partial<Pick<EventRecord, 'current_round' | 'players'>>;
+export const createEvent = createRecord<EventRecord, CreateEventInput>('event', {
   name: '',
   current_round: 1,
   players: [],
@@ -40,12 +40,12 @@ export const createEvent = createRecord<Event, CreateEventInput>('event', {
   eventType: 'swiss'
 });
 
-export type UpdateEventInput = Pick<Event, 'name' | 'players' | 'done'>;
-export const updateEvent = updateRecord<Event, UpdateEventInput>();
+export type UpdateEventInput = Pick<EventRecord, 'name' | 'players' | 'done'>;
+export const updateEvent = updateRecord<EventRecord, UpdateEventInput>();
 
-export const deleteEvent = deleteRecord<Event>();
+export const deleteEvent = deleteRecord<EventRecord>();
 
-export const mergeEvents = async (input: CreateEventInput, eventIds: string[]): Promise<Event> => {
+export const mergeEvents = async (input: CreateEventInput, eventIds: string[]): Promise<EventRecord> => {
   const events = await getEvents(eventIds);
   const matches = await (await Promise.all(eventIds.map((id) => getMatchesByEvent(id)))).flat();
 
@@ -69,7 +69,7 @@ export const mergeEvents = async (input: CreateEventInput, eventIds: string[]): 
   return newEvent;
 };
 
-export const addPlayerToEvent = async (eventId: string, playerId: string): Promise<Event> => {
+export const addPlayerToEvent = async (eventId: string, playerId: string): Promise<EventRecord> => {
   const oldEvent = await getEvent(eventId);
   const players = union(oldEvent.players, [playerId]);
 
@@ -81,7 +81,7 @@ export const addPlayerToEvent = async (eventId: string, playerId: string): Promi
   return updateEvent(oldEvent, { players });
 };
 
-export const removePlayerFromEvent = async (eventId: string, playerId: string): Promise<Event> => {
+export const removePlayerFromEvent = async (eventId: string, playerId: string): Promise<EventRecord> => {
   const oldEvent = await getEvent(eventId);
   const players = oldEvent.players.filter((id) => id !== playerId);
 

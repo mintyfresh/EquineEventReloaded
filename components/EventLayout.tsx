@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import type { ReactNode } from 'react';
-import type { Event } from '../lib/events';
+import type { Event } from '../api/types';
 import EventNav from './EventNav';
 import Layout from './Layout';
 

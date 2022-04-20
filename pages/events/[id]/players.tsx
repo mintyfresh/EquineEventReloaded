@@ -1,11 +1,13 @@
 import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
 import { Card } from 'react-bootstrap';
+import { Client } from '../../../api/client';
+import { Server } from '../../../api/server';
+import type { Event, Player, UpdateEventPlayerInput } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import PlayerCreateForm from '../../../components/PlayerCreateForm';
 import PlayerList from '../../../components/PlayerList';
-import { addPlayerToEvent, Event, getEvent, removePlayerFromEvent } from '../../../lib/events';
-import { getPlayers, Player } from '../../../lib/players';
+import type { CreatePlayerInput } from '../../../lib/db/players';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventPlayersPageProps> = async ({ params }) => {
@@ -15,11 +17,8 @@ export const getServerSideProps: GetServerSideProps<EventPlayersPageProps> = asy
     };
   }
 
-  const event = await getEvent(params.id as string);
-  const players = await getPlayers(event.players);
-
   return {
-    props: { event, players }
+    props: await Server.listEventPlayers(params.id as string)
   };
 };
 
@@ -32,22 +31,25 @@ const EventPlayersPage: NextPageWithLayout<EventPlayersPageProps> = ({ event: in
   const [event, setEvent] = useState(initialEvent);
   const [players, setPlayers] = useState(initialPlayers);
 
-  const onPlayerCreate = async (player: Player) => {
-    const updatedEvent = await addPlayerToEvent(event._id, player._id);
+  const onPlayerCreate = async (input: CreatePlayerInput) => {
+    const { event: updatedEvent, player } = await Client.createEventPlayer(event.id, input)
 
     setEvent(updatedEvent);
     setPlayers([...players, player]);
   };
 
-  const onPlayerUpdate = async (player: Player) => {
-    setPlayers(players.map((p) => p._id === player._id ? player : p));
+  const onPlayerUpdate = async (player: Player, input: UpdateEventPlayerInput) => {
+    const { event: updatedEvent, player: updatedPlayer } = await Client.updateEventPlayer(event.id, player.id, input);
+
+    setEvent(updatedEvent);
+    setPlayers(players.map((p) => p.id === updatedPlayer.id ? updatedPlayer : p));
   };
 
   const onPlayerDelete = async (player: Player) => {
-    const updatedEvent = await removePlayerFromEvent(event._id, player._id);
+    const { event: updatedEvent } = await Client.deleteEventPlayer(event.id, player.id);
           
     setEvent(updatedEvent);
-    setPlayers(players.filter((p) => p._id !== player._id));
+    setPlayers(players.filter((p) => p.id !== player.id));
   };
 
   return (

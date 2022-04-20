@@ -1,11 +1,11 @@
 import { without } from 'lodash';
 import { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { Event, mergeEvents } from '../lib/events';
+import type { Event } from '../api/types';
 
 interface EventMergeModalProps {
   events: Event[];
-  onEventsMerge: (event: Event) => (void | Promise<void>);
+  onEventsMerge: (events: Event[]) => (void | Promise<void>);
   show: boolean;
   onHide: () => void;
 }
@@ -16,7 +16,7 @@ const EventMergeModal: React.FC<EventMergeModalProps> = ({ events, onEventsMerge
   const [event2, setEvent2] = useState<Event | null>(null);
 
   const findEvent = (id: string) => (
-    events.find((event) => event._id === id) || null
+    events.find((event) => event.id === id) || null
   );
 
   const eventsExcluding = (event: Event | null) => (
@@ -33,12 +33,7 @@ const EventMergeModal: React.FC<EventMergeModalProps> = ({ events, onEventsMerge
           event.preventDefault();
           
           if (event1 && event2) {
-            const newEvent = await mergeEvents({ name }, [event1._id, event2._id]);
-            await onEventsMerge(newEvent);
-
-            setName('');
-            setEvent1(null);
-            setEvent2(null);
+            await onEventsMerge([event1, event2])
           }
         }}>
           <Form.Group className="mb-3">
@@ -53,12 +48,12 @@ const EventMergeModal: React.FC<EventMergeModalProps> = ({ events, onEventsMerge
             <Form.Label>First Event</Form.Label>
             <Form.Select
               title="Select an event"
-              value={event1?._id || ''}
+              value={event1?.id || ''}
               onChange={(event) => setEvent1(findEvent(event.currentTarget.value))}
             >
               <option value=""></option>
               {eventsExcluding(event2).map((event) => (
-                <option key={event._id} value={event._id}>
+                <option key={event.id} value={event.id}>
                   {event.name}
                 </option>
               ))}
@@ -68,12 +63,12 @@ const EventMergeModal: React.FC<EventMergeModalProps> = ({ events, onEventsMerge
             <Form.Label>Second Event</Form.Label>
             <Form.Select
               title="Select an event"
-              value={event2?._id || ''}
+              value={event2?.id || ''}
               onChange={(event) => setEvent2(findEvent(event.currentTarget.value))}
             >
               <option value=""></option>
               {eventsExcluding(event1).map((event) => (
-                <option key={event._id} value={event._id}>
+                <option key={event.id} value={event.id}>
                   {event.name}
                 </option>
               ))}

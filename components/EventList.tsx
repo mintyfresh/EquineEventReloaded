@@ -1,5 +1,5 @@
 import { ListGroup } from 'react-bootstrap';
-import type { Event } from '../lib/events';
+import type { Event } from '../api/types';
 import EventListItem from './EventList/EventListItem';
 
 export interface EventListProps {
@@ -11,7 +11,7 @@ const EventList: React.FC<EventListProps> = ({ events, onEventDelete }) => {
   return (
     <ListGroup>
       {events.map((event) => (
-        <ListGroup.Item key={event._id}>
+        <ListGroup.Item key={event.id}>
           <EventListItem event={event} onEventDelete={onEventDelete} />
         </ListGroup.Item>
       ))}

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
-import { createEvent, Event } from '../lib/events';
+import type { CreateEventInput } from '../api/types/event';
 
 export interface EventCreateFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
-  onEventCreate: (event: Event) => (void | Promise<void>);
+  onEventCreate: (input: CreateEventInput) => (void | Promise<void>);
 }
 
 const EventCreateForm: React.FC<EventCreateFormProps> = ({ onEventCreate, ...props }) => {
@@ -12,9 +12,7 @@ const EventCreateForm: React.FC<EventCreateFormProps> = ({ onEventCreate, ...pro
   return (
     <Form {...props} onSubmit={async (event) => {
       event.preventDefault();
-      const newEvent = await createEvent({ name });
-
-      await onEventCreate(newEvent);
+      await onEventCreate({ name });
 
       // Reset inputs.
       setName('');

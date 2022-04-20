@@ -1,23 +1,22 @@
 import { ListGroup } from 'react-bootstrap';
-import type { Match } from '../lib/matches';
-import type { Player } from '../lib/players';
+import type { Match, Player, UpdateEventMatchInput } from '../api/types';
 import MatchListItem from './MatchList/MatchListItem';
 
 export interface MatchListProps {
-  players: Player[];
   matches: Match[];
-  onMatchUpdate: (match: Match) => (void | Promise<void>);
+  onMatchUpdate: (match: Match, input: UpdateEventMatchInput) => (void | Promise<void>);
+  onMatchDelete: (match: Match) => (void | Promise<void>);
 }
 
-const MatchList: React.FC<MatchListProps> = ({ players, matches, onMatchUpdate }) => { 
+const MatchList: React.FC<MatchListProps> = ({ matches, onMatchUpdate, onMatchDelete }) => { 
   return (
     <ListGroup>
       {matches.map((match) => (
-        <ListGroup.Item key={match._id}>
+        <ListGroup.Item key={match.id}>
           <MatchListItem
             match={match}
-            players={players}
             onMatchUpdate={onMatchUpdate}
+            onMatchDelete={onMatchDelete}
           />
         </ListGroup.Item>
       ))}

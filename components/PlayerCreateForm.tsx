@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button, Col, Form, Row, ToggleButton } from 'react-bootstrap';
-import { createPlayer, Player } from '../lib/players';
+import { createPlayer, PlayerRecord } from '../lib/db/players';
 
 export interface PlayerCreateFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
-  onPlayerCreate: (player: Player) => (void | Promise<void>);
+  onPlayerCreate: (player: PlayerRecord) => (void | Promise<void>);
 }
 
 const PlayerCreateForm: React.FC<PlayerCreateFormProps> = ({ onPlayerCreate, ...props }) => {

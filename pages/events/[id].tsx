@@ -1,7 +1,8 @@
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
+import { Server } from '../../api/server';
+import type { Event } from '../../api/types';
 import EventLayout from '../../components/EventLayout';
-import { Event, getEvent } from '../../lib/events';
 import type { NextPageWithLayout } from '../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<ShowEventPageProps> = async ({ params }) => {
@@ -12,7 +13,7 @@ export const getServerSideProps: GetServerSideProps<ShowEventPageProps> = async 
   }
 
   return {
-    props: { event: await getEvent(params.id as string) }
+    props: await Server.getEvent(params.id as string)
   };
 };
 
@@ -25,7 +26,7 @@ const ShowEventPage: NextPageWithLayout<ShowEventPageProps> = ({ event }) => {
     <>
       <dl>
         <dt>Type</dt>
-        <dd>{event.eventType}</dd>
+        <dd>Swiss</dd>
         <dt>Active</dt>
         <dd>{!event.done ? 'Yes' : 'No'}</dd>
       </dl>

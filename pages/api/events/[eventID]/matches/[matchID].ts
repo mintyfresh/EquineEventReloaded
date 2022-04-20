@@ -1,0 +1,27 @@
+import { NextApiHandler } from 'next';
+import { Server } from '../../../../../api/server';
+import type { DeleteEventMatchResponse, UpdateEventMatchResponse } from '../../../../../api/types';
+
+const handler: NextApiHandler<UpdateEventMatchResponse | DeleteEventMatchResponse | { error: any }> = async (req, res) => {
+  const eventID = req.query.eventID as string;
+  const matchID = req.query.matchID as string;
+
+  try {
+    switch (req.method) {
+      case 'PUT':
+      case 'PATCH':
+        return res.status(200).json(await Server.updateEventMatch(eventID, matchID, req.body.input));
+
+      case 'DELETE':
+        return res.status(200).json(await Server.deleteEventMatch(eventID, matchID));
+
+      default:
+        res.setHeader('Allow', ['PUT', 'PATCH', 'DELETE']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+
+export default handler;

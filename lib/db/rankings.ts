@@ -1,12 +1,12 @@
-import type { Event } from './events';
-import { getMatchesByEvent, isLoser, isTie, isWinner, Match } from './matches';
-import { getPlayers, Player } from './players';
+import type { EventRecord } from './events';
+import { getMatchesByEvent, isLoser, isTie, isWinner, MatchRecord } from './matches';
+import { getPlayers, PlayerRecord } from './players';
 
-export interface RankedPlayer extends Player {
+export interface RankedPlayer extends PlayerRecord {
   points: number;
 }
 
-export const getPlayerStatistics = (matches: Match[], player: Player): [number, number, number] => {
+export const getPlayerStatistics = (matches: MatchRecord[], player: PlayerRecord): [number, number, number] => {
   // Only consider matches the player is involved in.
   matches = matches.filter((match) =>
     match.players.includes(player._id)
@@ -19,13 +19,13 @@ export const getPlayerStatistics = (matches: Match[], player: Player): [number, 
   return [wins, losses, ties];
 };
 
-export const calculatePlayerPoints = (matches: Match[], player: Player): number => {
+export const calculatePlayerPoints = (matches: MatchRecord[], player: PlayerRecord): number => {
   const [wins, losses, ties] = getPlayerStatistics(matches, player);
 
   return (wins * 3) + (losses * 0) + (ties * 1);
 };
 
-export const getRankedPlayers = async (event: Event): Promise<RankedPlayer[]> => {
+export const getRankedPlayers = async (event: EventRecord): Promise<RankedPlayer[]> => {
   const players = await getPlayers(event.players);
   const matches = await getMatchesByEvent(event._id);
 

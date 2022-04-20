@@ -1,21 +1,20 @@
 import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { Match } from '../../lib/matches';
-import { Player } from '../../lib/players';
+import type { Match, Player, UpdateEventMatchInput } from '../../api/types';
 import EllipsisDropdown from '../EllipsisDropdown';
 import MatchResolutionModal from './MatchResolutionModal';
 
 export interface MatchListItemProps {
   match: Match;
-  players: Player[];
-  onMatchUpdate: (match: Match) => (void | Promise<void>);
+  onMatchUpdate: (match: Match, input: UpdateEventMatchInput) => (void | Promise<void>);
+  onMatchDelete: (match: Match) => (void | Promise<void>);
 }
 
-const MatchListItem: React.FC<MatchListItemProps> = ({ match, players, onMatchUpdate }) => {
+const MatchListItem: React.FC<MatchListItemProps> = ({ match, onMatchUpdate, onMatchDelete }) => {
   const [showResolutionModal, setShowResolutionModal] = useState(false);
 
-  const player1 = players.find((player) => player._id === match.players[0]);
-  const player2 = players.find((player) => player._id === match.players[1]);
+  const player1 = match.players[0];
+  const player2 = match.players[1];
 
   return (
     <>
@@ -25,18 +24,19 @@ const MatchListItem: React.FC<MatchListItemProps> = ({ match, players, onMatchUp
       <EllipsisDropdown className="float-end">
         <Dropdown.Item onClick={() => setShowResolutionModal(true)}>Select Winner</Dropdown.Item>
         <Dropdown.Divider />
-        <Dropdown.Item className="text-danger">Delete</Dropdown.Item>
+        <Dropdown.Item className="text-danger" onClick={async () => {
+          if (confirm(`Are you sure you want to delete "${match.id}"?`)) {
+            await onMatchDelete(match);
+          }
+        }}>Delete</Dropdown.Item>
       </EllipsisDropdown>
       <MatchResolutionModal
         match={match}
-        players={players.filter((player) => 
-          match.players.includes(player._id)  
-        )}
         show={showResolutionModal}
         onHide={() => setShowResolutionModal(false)}
-        onWinnerSelect={(match) => {
+        onWinnerSelect={async (match, input) => {
           setShowResolutionModal(false);
-          onMatchUpdate(match);
+          await onMatchUpdate(match, input);
         }}
       />
     </>

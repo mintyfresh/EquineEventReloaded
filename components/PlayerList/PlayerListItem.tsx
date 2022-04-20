@@ -1,5 +1,5 @@
 import { Badge, Dropdown } from 'react-bootstrap';
-import { deletePlayer, Player, updatePlayer } from '../../lib/players';
+import type { Player, UpdateEventPlayerInput } from '../../api/types';
 import EllipsisDropdown from '../EllipsisDropdown';
 
 const UnpaidBadge = () => (
@@ -12,15 +12,13 @@ const DroppedBadge = () => (
 
 export interface PlayerListItemProps {
   player: Player;
-  onPlayerUpdate: (player: Player) => (void | Promise<void>);
+  onPlayerUpdate: (player: Player, input: UpdateEventPlayerInput) => (void | Promise<void>);
   onPlayerDelete: (player: Player) => (void | Promise<void>);
 }
 
 const PlayerListItem: React.FC<PlayerListItemProps> = ({ player, onPlayerUpdate, onPlayerDelete }) => {
   const toggleAttribute = async (name: keyof Player) => {
-    const updatedPlayer = await updatePlayer(player, { [name]: !player[name] });
-
-    await onPlayerUpdate(updatedPlayer);
+    await onPlayerUpdate(player, { [name]: !player[name] });
   };
 
   return (
@@ -38,7 +36,6 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({ player, onPlayerUpdate,
         <Dropdown.Divider />
         <Dropdown.Item className="text-danger" onClick={async () => {
           if (confirm(`Are you sure you want to delete "${player.name}"?`)) {
-            await deletePlayer(player);
             await onPlayerDelete(player);
           }
         }}>

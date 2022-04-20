@@ -18,6 +18,19 @@ export interface RecordList<T extends Record> {
   total_count: number;
 }
 
+export const getRecordByID = <T extends Record>() => {
+  return async (id: string): Promise<T> => {
+    const response = await fetch(`http://localhost:5984/eer/${id}`);
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    return data;
+  }
+};
+
 export const getRecordsByIDs = <T extends Record>() => {
   return async (ids: string[]): Promise<T[]> => {
     const docs = ids.map((id) => ({ id }));
@@ -97,8 +110,10 @@ export const updateRecord = <T extends Record, TInput>() => {
 };
 
 export const deleteRecord = <T extends Record>() => {
-  return async (record: T): Promise<void> => {
-    await fetch(`http://localhost:5984/eer/${record._id}?rev=${record._rev}`, {
+  return async (record: Pick<T, '_id'> & Partial<Pick<T, '_rev'>>): Promise<void> => {
+    const _rev = record._rev ?? (await getRecordByID<T>()(record._id))._rev;
+
+    await fetch(`http://localhost:5984/eer/${record._id}?rev=${_rev}`, {
       method: 'DELETE'
     });
   };
