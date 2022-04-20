@@ -1,6 +1,6 @@
 import { concat, map, max, union } from 'lodash';
-import { createRecord, deleteRecord, getRecordsByIDs, getRecordsByKeys, Record, RecordList, updateRecord } from './db';
-import { createMatch, getMatches } from './matches';
+import { createRecord, deleteRecord, getRecordsByIDs, getRecordsByKey, Record, RecordList, updateRecord } from './db';
+import { createMatch, getMatchesByEvent } from './matches';
 
 export interface Event extends Record {
   type: 'event';
@@ -47,7 +47,7 @@ export const deleteEvent = deleteRecord<Event>();
 
 export const mergeEvents = async (input: CreateEventInput, eventIds: string[]): Promise<Event> => {
   const events = await getEvents(eventIds);
-  const matches = await getMatches(eventIds);
+  const matches = await (await Promise.all(eventIds.map((id) => getMatchesByEvent(id)))).flat();
 
   const newEvent = await createEvent({
     ...input,

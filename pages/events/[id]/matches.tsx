@@ -5,7 +5,7 @@ import { Button, ButtonToolbar, Card, Col, Form, Row } from 'react-bootstrap';
 import EventLayout from '../../../components/EventLayout';
 import MatchList from '../../../components/MatchList';
 import { Event, getEvent } from '../../../lib/events';
-import { getMatches, Match } from '../../../lib/matches';
+import { getMatchesByEvent, Match } from '../../../lib/matches';
 import { getPlayers, Player } from '../../../lib/players';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps<EventMatchesPageProps> = asy
 
   const event = await getEvent(params.id as string);
   const players = await getPlayers(event.players);
-  const matches = sortBy(await getMatches(event._id), 'table');
+  const matches = sortBy(await getMatchesByEvent(event._id), 'table');
 
   return {
     props: { event, players, matches }

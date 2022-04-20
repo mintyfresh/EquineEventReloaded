@@ -1,4 +1,4 @@
-import { createRecord, deleteRecord, generateRecordID, Record, RecordList, updateRecord } from './db';
+import { createRecord, deleteRecord, generateRecordID, getRecordsByKey, Record, RecordList, updateRecord } from './db';
 import { Event } from './events';
 import { Player } from './players';
 
@@ -15,13 +15,7 @@ export interface Match extends Record {
 
 export const TIE = 'tie';
 
-export const getMatches = async (eventId: string[] | string): Promise<Match[]> => {
-  const key = Array.isArray(eventId) ? eventId : [eventId];
-  const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/matches?key=${JSON.stringify(key)}`);
-  const { rows }: RecordList<Match> = await response.json();
-
-  return rows.map((match) => match.value);
-};
+export const getMatchesByEvent = getRecordsByKey<Match>('matches');
 
 export type CreateMatchInput = Pick<Match, 'event'> & Partial<Pick<Match, 'games' | 'players' | 'rank' | 'round' | 'winner'>>;
 export const createMatch = createRecord<Match, CreateMatchInput>('match', {

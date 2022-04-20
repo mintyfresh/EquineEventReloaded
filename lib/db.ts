@@ -34,9 +34,9 @@ export const getRecordsByIDs = <T extends Record>() => {
   };
 };
 
-export const getRecordsByKeys = <T extends Record>(view: string) => {
-  return async (keys: string[]): Promise<T[]> => {
-    const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/${view}?keys=${JSON.stringify(keys)}`);
+export const getRecordsByKey = <T extends Record>(view: string) => {
+  return async (key: string): Promise<T[]> => {
+    const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/${view}?key=${JSON.stringify([key])}`);
     const { rows }: RecordList<T> = await response.json();
 
     return rows.map((record) => record.value);
@@ -51,9 +51,9 @@ export const createRecord = <T extends Record, TInput, TDefaults = Omit<T, '_id'
   return async (input: TInput): Promise<Pick<T, '_id' | '_rev' | 'type'> & TDefaults & TInput> => {
     const payload: Pick<T, '_id' | 'type'> & TDefaults & TInput = {
       ...defaults,
-      _id: generateRecordID<T>(type),
       type: type,
       ...input,
+      _id: generateRecordID<T>(type),
       _rev: undefined
     };
 
@@ -75,17 +75,21 @@ export const createRecord = <T extends Record, TInput, TDefaults = Omit<T, '_id'
 
 export const updateRecord = <T extends Record, TInput>() => {
   return async (record: T, input: Partial<TInput>): Promise<T & Partial<TInput>> => {
+    const payload = {
+      ...record,
+      ...input
+    };
+
     const response = await fetch(`http://localhost:5984/eer/${record._id}?rev=${record._rev}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input)
+      body: JSON.stringify(payload)
     });
 
     const { id, rev } = await response.json();
 
     return {
-      ...record,
-      ...input,
+      ...payload,
       _id: id,
       _rev: rev
     }

@@ -1,5 +1,5 @@
 import type { Event } from './events';
-import { getMatches, isLoser, isTie, isWinner, Match } from './matches';
+import { getMatchesByEvent, isLoser, isTie, isWinner, Match } from './matches';
 import { getPlayers, Player } from './players';
 
 export interface RankedPlayer extends Player {
@@ -27,7 +27,7 @@ export const calculatePlayerPoints = (matches: Match[], player: Player): number 
 
 export const getRankedPlayers = async (event: Event): Promise<RankedPlayer[]> => {
   const players = await getPlayers(event.players);
-  const matches = await getMatches(event._id);
+  const matches = await getMatchesByEvent(event._id);
 
   const rankedPlayers = players
     .filter((player) => (
