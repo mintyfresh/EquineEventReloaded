@@ -6,6 +6,7 @@ import { Server } from '../../../api/server';
 import type { Event, Match, UpdateEventMatchInput } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import MatchList from '../../../components/MatchList';
+import { getRankedPairings } from '../../../lib/rankings';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventMatchesPageProps> = async ({ params }) => {
@@ -43,6 +44,12 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event, ma
     setMatches(matches.filter((m) => m.id !== match.id));
   };
 
+  const pairNextMatch = async () => {
+    const pairings = await getRankedPairings(event);
+
+    console.log(pairings);
+  };
+
   return (
     <>
       <Row className="mb-3">
@@ -55,7 +62,7 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event, ma
         </Col>
         <Col xs="auto" className="ms-auto">
           <ButtonToolbar className="gap-2">
-            <Button variant="outline-secondary">Pair Next Match</Button>
+            <Button variant="outline-secondary" onClick={async () => await pairNextMatch()}>Pair Next Match</Button>
             <Button variant="outline-secondary">Pair Current Match</Button>
             <Button variant="outline-secondary">Unpair Last Round</Button>
           </ButtonToolbar>

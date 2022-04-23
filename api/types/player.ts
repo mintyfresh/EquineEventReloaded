@@ -1,6 +1,6 @@
 import type { MatchRecord } from '../../lib/db/matches';
 import type { PlayerRecord } from '../../lib/db/players';
-import { getPlayerStatistics } from '../../lib/db/rankings';
+import { calculatePoints, getPlayerStatistics } from '../../lib/rankings';
 import type { Event } from './event';
 
 export interface Player {
@@ -44,7 +44,7 @@ export interface DeleteEventPlayerResponse {
 
 export const serializePlayerRecord = (player: PlayerRecord, matches: MatchRecord[]): Player => {
   const [wins, losses, ties] = getPlayerStatistics(matches, player);
-  const points = (wins * 3) + (losses * 0) + (ties * 1);
+  const points = calculatePoints(wins, losses, ties);
 
   return {
     id: player._id,
