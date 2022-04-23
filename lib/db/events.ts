@@ -40,7 +40,7 @@ export const createEvent = createRecord<EventRecord, CreateEventInput>('event', 
   eventType: 'swiss'
 });
 
-export type UpdateEventInput = Pick<EventRecord, 'name' | 'players' | 'done'>;
+export type UpdateEventInput = Partial<Pick<EventRecord, 'name' | 'players' | 'done' | 'current_round'>>;
 export const updateEvent = updateRecord<EventRecord, UpdateEventInput>();
 
 export const deleteEvent = deleteRecord<EventRecord>();

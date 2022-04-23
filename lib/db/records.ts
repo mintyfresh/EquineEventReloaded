@@ -86,6 +86,33 @@ export const createRecord = <T extends Record, TInput, TDefaults = Omit<T, '_id'
   };
 };
 
+export const createBulkRecords = <T extends Record, TInput, TDefaults = Omit<T, '_id' | '_rev' | 'type'>>(type: string, defaults: TDefaults) => {
+  return async (inputs: TInput[]): Promise<(Pick<T, '_id' | '_rev' | 'type'> & TDefaults & TInput)[]> => {
+    const payloads: (Pick<T, '_id' | 'type'> & TDefaults & TInput)[] = inputs.map((input) => ({
+      ...defaults,
+      type: type,
+      ...input,
+      _id: generateRecordID<T>(type),
+      _rev: undefined
+    }));
+
+    const response = await fetch(`http://localhost:5984/eer/_bulk_docs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ docs: payloads })
+    });
+
+    const results = await response.json();
+
+    return results.map(({ id, rev }: { id: string, rev: string }) => ({
+      ...payloads.find((payload) => payload._id === id),
+      _id: id,
+      _rev: rev
+    }));
+  };
+};
+
+
 export const updateRecord = <T extends Record, TInput>() => {
   return async (record: T, input: Partial<TInput>): Promise<T & Partial<TInput>> => {
     const payload = {

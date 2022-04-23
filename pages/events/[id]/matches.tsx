@@ -29,7 +29,8 @@ interface EventMatchesPageProps {
   matches: Match[];
 }
 
-const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event, matches: initialMatches }) => {
+const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event: initialEvent, matches: initialMatches }) => {
+  const [event, setEvent] = useState(initialEvent);
   const [matches, setMatches] = useState(initialMatches);
 
   const onMatchUpdate = async (match: Match, input: UpdateEventMatchInput) => {
@@ -44,10 +45,16 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event, ma
     setMatches(matches.filter((m) => m.id !== match.id));
   };
 
-  const pairNextMatch = async () => {
-    const pairings = await getRankedPairings(event);
+  const pairNextRound = async () => {
+    const response = await fetch(`/api/events/${event.id}/matches/next`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-    console.log(pairings);
+    const { event: updatedEvent, matches } = await response.json();
+
+    setEvent(updatedEvent);
+    setMatches(matches);
   };
 
   return (
@@ -62,8 +69,8 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event, ma
         </Col>
         <Col xs="auto" className="ms-auto">
           <ButtonToolbar className="gap-2">
-            <Button variant="outline-secondary" onClick={async () => await pairNextMatch()}>Pair Next Match</Button>
-            <Button variant="outline-secondary">Pair Current Match</Button>
+            <Button variant="outline-secondary" onClick={async () => await pairNextRound()}>Pair Next Round</Button>
+            <Button variant="outline-secondary">Pair Current Round</Button>
             <Button variant="outline-secondary">Unpair Last Round</Button>
           </ButtonToolbar>
         </Col>

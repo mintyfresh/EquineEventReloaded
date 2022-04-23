@@ -22,6 +22,10 @@ export interface CreateEventResponse {
   event: Event;
 }
 
+export interface UpdateEventResponse {
+  event: Event;
+}
+
 export interface DeleteEventResponse {
   ok: boolean;
 }

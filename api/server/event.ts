@@ -1,5 +1,5 @@
-import { createEvent as createEventRecord, CreateEventInput, deleteEvent as deleteEventRecord, getEvent as getEventRecord, listEvents as listEventRecords } from '../../lib/db/events';
-import { CreateEventResponse, DeleteEventResponse, GetEventResponse, ListEventsResponse, serializeEventRecord } from '../types/event';
+import { createEvent as createEventRecord, CreateEventInput, updateEvent as updateEventRecord, deleteEvent as deleteEventRecord, getEvent as getEventRecord, listEvents as listEventRecords, UpdateEventInput } from '../../lib/db/events';
+import { CreateEventResponse, DeleteEventResponse, GetEventResponse, ListEventsResponse, serializeEventRecord, UpdateEventResponse } from '../types/event';
 
 export const listEvents = async (): Promise<ListEventsResponse> => {
   const events = await listEventRecords();
@@ -22,6 +22,15 @@ export const createEvent = async (input: CreateEventInput): Promise<CreateEventR
 
   return {
     event: serializeEventRecord(event)
+  };
+};
+
+export const updateEvent = async (eventID: string, input: UpdateEventInput): Promise<UpdateEventResponse> => {
+  const oldEvent = await getEventRecord(eventID);
+  const newEvent = await updateEventRecord(oldEvent, input);
+
+  return {
+    event: serializeEventRecord(newEvent)
   };
 };
 

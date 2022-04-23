@@ -6,6 +6,7 @@ export namespace Server {
   export const listEvents  = events.listEvents;
   export const getEvent    = events.getEvent;
   export const createEvent = events.createEvent;
+  export const updateEvent = events.updateEvent;
   export const deleteEvent = events.deleteEvent;
 
   export const listEventMatches = matches.listEventMatches;

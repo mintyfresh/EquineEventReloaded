@@ -1,4 +1,5 @@
 import { shuffle } from 'lodash';
+import { NIL as NIL_UUID } from 'uuid';
 import { Server } from '../api/server';
 import type { Event, Player } from '../api/types';
 import { isLoser, isTie, isWinner, MatchRecord } from './db/matches';
@@ -21,8 +22,8 @@ export const calculatePoints = (wins: number, losses: number, ties: number): num
   return (wins * 3) + (losses * 0) + (ties * 1);
 };
 
-const PLACEHOLDER_PLAYER: Player = {
-  id: 'BYE',
+export const PLACEHOLDER_PLAYER: Player = {
+  id: `player.${NIL_UUID}`,
   name: 'BYE',
   paid: true,
   dropped: false,
@@ -30,6 +31,14 @@ const PLACEHOLDER_PLAYER: Player = {
   wins: 0,
   losses: 0,
   ties: 0
+};
+
+export const isPlaceholderPlayer = (player: Player | string): boolean => {
+  if (typeof player === 'string') {
+    return player === PLACEHOLDER_PLAYER.id;
+  } else {
+    return player.id === PLACEHOLDER_PLAYER.id;
+  }
 };
 
 const isEligibleForMatch = (player: Player): boolean => {
@@ -47,7 +56,7 @@ const getRankedPlayers = async (event: Event): Promise<Player[]> => {
   return shuffle(players);
 };
 
-export const getRankedPairings = async (event: Event): Promise<[number, number, number][]> => {
+export const getRankedPairings = async (event: Event): Promise<[string, string, number][]> => {
   const players = await getRankedPlayers(event);
   const { matches } = await Server.listEventMatches(event.id);
 
@@ -80,7 +89,7 @@ export const getRankedPairings = async (event: Event): Promise<[number, number, 
     playerOpponents.get(player2)?.add(player1);
   });
 
-  const edgeList: [number, number, number][] = [];
+  const edgeList: [string, string, number][] = [];
   const rankedPlayers = players.filter((player) => !playersToRemove.has(player));
 
   rankedPlayers.forEach((player, playerIndex) => {
@@ -98,7 +107,7 @@ export const getRankedPairings = async (event: Event): Promise<[number, number, 
         weight = ((max + min) / 2) - (max - min)**2;
       }
 
-      edgeList.push([playerIndex, opponentOffset + opponentIndex, weight]);
+      edgeList.push([player.id, opponent.id, weight]);
     });
   });
 
