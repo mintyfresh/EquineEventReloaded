@@ -1,4 +1,3 @@
-import { sortBy } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
 import { Card } from 'react-bootstrap';
@@ -6,9 +5,6 @@ import { Server } from '../../../api/server';
 import { Event, Match } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import Slip from '../../../components/Slip';
-import { EventRecord, getEvent } from '../../../lib/db/events';
-import { getMatchesByEvent, MatchRecord } from '../../../lib/db/matches';
-import { getRankedPlayers, RankedPlayer } from '../../../lib/db/rankings';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async ({ params }) => {
