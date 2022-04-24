@@ -1,3 +1,5 @@
+import { faCrown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import type { Match, Player, UpdateEventMatchInput } from '../../api/types';
@@ -16,13 +18,40 @@ const MatchListItem: React.FC<MatchListItemProps> = ({ match, onMatchUpdate, onM
   const player1 = match.players[0];
   const player2 = match.players[1];
 
+  const isWinner = (player: Player) => player.id === match.winner;
+
+  const PlayerName = ({ player }: { player: Player | null }) => {
+    if (!player) {
+      return (
+        <span className="text-muted">
+          None
+        </span>
+      );
+    }
+
+    return (
+      <>
+        {isWinner(player) && (
+          <FontAwesomeIcon icon={faCrown} className="me-1" color="gold" />
+        )}
+        {player.name}
+      </>
+    );
+  };
+
   return (
     <>
       Table {match.table}{': '}
-      {player1?.name ?? <span className="text-muted">None</span>} vs.{' '}
-      {player2?.name ?? <span className="text-muted">None</span>}
+      <PlayerName player={player1} /> vs. <PlayerName player={player2} />
+      {' '}|{' '}
+      {player1?.points || 0} vs. {player2?.points || 0}
       <EllipsisDropdown className="float-end">
-        <Dropdown.Item onClick={() => setShowResolutionModal(true)}>Select Winner</Dropdown.Item>
+        <Dropdown.Item
+          disabled={!player2}
+          onClick={() => setShowResolutionModal(true)}
+        >
+          Select Winner
+        </Dropdown.Item>
         <Dropdown.Divider />
         <Dropdown.Item className="text-danger" onClick={async () => {
           if (confirm(`Are you sure you want to delete "${match.id}"?`)) {
