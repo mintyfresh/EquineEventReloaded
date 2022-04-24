@@ -1,6 +1,6 @@
 import type { MatchRecord } from '../../lib/db/matches';
 import type { PlayerRecord } from '../../lib/db/players';
-import { calculatePoints, getPlayerStatistics } from '../../lib/rankings';
+import { calculateOpponentWinPercentage, calculatePoints, getPlayerStatistics } from '../../lib/rankings';
 import type { Event } from './event';
 
 export interface Player {
@@ -12,6 +12,7 @@ export interface Player {
   wins: number;
   losses: number;
   ties: number;
+  opponentWinPercentage: number;
 }
 
 export interface ListEventPlayersResponse {
@@ -43,8 +44,9 @@ export interface DeleteEventPlayerResponse {
 }
 
 export const serializePlayerRecord = (player: PlayerRecord, matches: MatchRecord[]): Player => {
-  const [wins, losses, ties] = getPlayerStatistics(matches, player);
+  const [wins, losses, ties] = getPlayerStatistics(player._id, matches);
   const points = calculatePoints(wins, losses, ties);
+  const opponentWinPercentage = calculateOpponentWinPercentage(player._id, matches);
 
   return {
     id: player._id,
@@ -54,6 +56,7 @@ export const serializePlayerRecord = (player: PlayerRecord, matches: MatchRecord
     points,
     wins,
     losses,
-    ties
+    ties,
+    opponentWinPercentage
   };
 };

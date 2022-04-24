@@ -44,14 +44,14 @@ export const updateMatch = updateRecord<MatchRecord, UpdateMatchInput>();
 export const deleteMatch = deleteRecord<MatchRecord>();
 export const deleteBulkMatches = deleteBulkRecords<MatchRecord>();
 
-export const isWinner = (match: MatchRecord, player: PlayerRecord): boolean => {
-  return match.winner === player._id;
+export const isWinner = (match: MatchRecord, playerID: string): boolean => {
+  return match.winner === playerID;
 }
 
 export const isTie = (match: MatchRecord): boolean => {
   return match.winner === TIE;
 };
 
-export const isLoser = (match: MatchRecord, player: PlayerRecord): boolean => {
-  return !!match.winner && match.winner !== player._id && match.winner !== TIE;
+export const isLoser = (match: MatchRecord, playerID: string): boolean => {
+  return !!match.winner && match.winner !== playerID && match.winner !== TIE;
 }

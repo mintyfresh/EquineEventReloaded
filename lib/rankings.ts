@@ -5,24 +5,63 @@ import type { Event, Player } from '../api/types';
 import { isLoser, isTie, isWinner, MatchRecord } from './db/matches';
 import { PlayerRecord } from './db/players';
 
-export const getPlayerStatistics = (matches: MatchRecord[], player: PlayerRecord): [number, number, number] => {
+export const getPlayerStatistics = (playerID: string, matches: MatchRecord[]): [number, number, number] => {
   // Only consider matches the player is involved in.
   matches = matches.filter((match) =>
-    match.players.includes(player._id)
+    match.players.includes(playerID)
   );
 
-  const wins   = matches.filter((match) => isWinner(match, player)).length;
-  const losses = matches.filter((match) => isLoser(match, player)).length;
+  const wins   = matches.filter((match) => isWinner(match, playerID)).length;
+  const losses = matches.filter((match) => isLoser(match, playerID)).length;
   const ties   = matches.filter(isTie).length;
 
   return [wins, losses, ties];
 };
 
-export const calculatePoints = (wins: number, losses: number, ties: number): number => {
-  return (wins * 3) + (losses * 0) + (ties * 1);
+export const calculateOpponentWinPercentage = (playerID: string, matches: MatchRecord[]): number => {
+  // Only consider matches the player is involved in.
+  const playerMatches = matches.filter((match) =>
+    match.players.includes(playerID)
+  );
+
+  let totalMatches = 0;
+  let totalOpponentsScore = 0;
+  
+  playerMatches.forEach((match) => {
+    if (match.players[1] === null) {
+      return;
+    }
+
+    const opponent = match.players[1] === playerID ?
+      match.players[0] :
+      match.players[1];
+
+    const opponentMatches = matches.filter((match) => match.players.includes(opponent));
+    const [wins, losses, ties] = getPlayerStatistics(opponent, opponentMatches);
+
+    const opponentPoints = calculatePoints(wins, losses, ties);
+    const maximumPossiblePoints = opponentMatches.length * POINTS_FOR_WIN;
+
+    totalOpponentsScore += opponentPoints / maximumPossiblePoints;
+    totalMatches += 1;
+  });
+
+  if (totalMatches === 0) {
+    return 0;
+  }
+
+  return totalOpponentsScore / totalMatches;
 };
 
-export const PLACEHOLDER_PLAYER: Player = {
+export const POINTS_FOR_WIN  = 3;
+export const POINTS_FOR_TIE  = 1;
+export const POINTS_FOR_LOSS = 0;
+
+export const calculatePoints = (wins: number, losses: number, ties: number): number => {
+  return (wins * POINTS_FOR_WIN) + (losses * POINTS_FOR_LOSS) + (ties * POINTS_FOR_TIE);
+};
+
+const PLACEHOLDER_PLAYER: Player = {
   id: `player.${NIL_UUID}`,
   name: 'BYE',
   paid: true,
@@ -30,15 +69,8 @@ export const PLACEHOLDER_PLAYER: Player = {
   points: 0,
   wins: 0,
   losses: 0,
-  ties: 0
-};
-
-export const isPlaceholderPlayer = (player: Player | string): boolean => {
-  if (typeof player === 'string') {
-    return player === PLACEHOLDER_PLAYER.id;
-  } else {
-    return player.id === PLACEHOLDER_PLAYER.id;
-  }
+  ties: 0,
+  opponentWinPercentage: 0
 };
 
 const isEligibleForMatch = (player: Player): boolean => {

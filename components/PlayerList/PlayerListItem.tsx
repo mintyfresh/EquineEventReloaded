@@ -23,13 +23,14 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({ player, onPlayerUpdate,
 
   return (
     <>
-      {player.name}
+      <span>
+        {player.name} -
+        [{player.wins}, {player.losses}, {player.ties}]
+        - {player.points} points
+        - {player.opponentWinPercentage.toFixed(4)}%
+      </span>
       {player.paid || <UnpaidBadge />}
       {player.dropped && <DroppedBadge />}
-      <span className="ms-1">
-        - [{player.wins}, {player.losses}, {player.ties}]
-        - {player.points} points
-      </span>
       <EllipsisDropdown className="float-end">
         <Dropdown.Item onClick={() => toggleAttribute('paid')}>
           Mark {player.paid ? 'unpaid' : 'paid'}
