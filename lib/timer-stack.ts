@@ -48,7 +48,7 @@ export const useTimerStack = function<T>({ onExpired }: { onExpired?: (data: T) 
       setTimers(timers.slice(1));
       onExpired?.(timers[0].data);
     }
-  }, [remaining, timers]);
+  }, [remaining, timers, onExpired]);
 
   const pushTimer = (duration: number, data: T) => {
     setTimers((timers) => [...timers, { duration, data }]);
