@@ -1,3 +1,4 @@
+import { sortBy } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
 import { Button, ButtonToolbar, Card, Col, Form, InputGroup, Row } from 'react-bootstrap';
@@ -6,6 +7,7 @@ import { Server } from '../../../api/server';
 import type { Event, Match, UpdateEventMatchInput } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import MatchList from '../../../components/MatchList';
+import { getRankedPairings } from '../../../lib/rankings';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventMatchesPageProps> = async ({ params }) => {
@@ -62,7 +64,15 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event: in
     const { event: updatedEvent, matches: newMatches } = await Client.createNextRound(event.id);
 
     setEvent(updatedEvent);
-    setMatches([...newMatches, ...matches]);
+    setMatches(sortBy([...newMatches, ...matches], 'round', 'table'));
+    setRoundFilter(newMatches[0]?.round || roundFilter);
+  };
+
+  const pairCurrentRound = async () => {
+    const { event: updatedEvent, matches: newMatches } = await Client.fillInCurrentRound(event.id);
+
+    setEvent(updatedEvent);
+    setMatches(sortBy([...newMatches, ...matches], 'round', 'table'));
     setRoundFilter(newMatches[0]?.round || roundFilter);
   };
 
@@ -113,7 +123,7 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event: in
         <Col xs="auto" className="ms-auto">
           <ButtonToolbar className="gap-2">
             <Button variant="outline-secondary" onClick={async () => await pairNextRound()}>Pair Next Round</Button>
-            <Button variant="outline-secondary">Pair Current Round</Button>
+            <Button variant="outline-secondary" onClick={async () => await pairCurrentRound()}>Pair Current Round</Button>
             <Button variant="outline-secondary" onClick={async () => await unpairLastRound()}>Unpair Last Round</Button>
           </ButtonToolbar>
         </Col>

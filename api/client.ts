@@ -20,5 +20,6 @@ export namespace Client {
   export const deleteEventPlayer = player.deleteEventPlayer;
 
   export const createNextRound    = round.createNextRound;
+  export const fillInCurrentRound = round.fillInCurrentRound;
   export const deleteCurrentRound = round.deleteCurrentRound;
 }

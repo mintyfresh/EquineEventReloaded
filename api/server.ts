@@ -21,5 +21,6 @@ export namespace Server {
   export const deleteEventPlayer = players.deleteEventPlayer;
 
   export const createNextRound    = rounds.createNextRound;
+  export const fillInCurrentRound = rounds.fillInCurrentRound;
   export const deleteCurrentRound = rounds.deleteCurrentRound;
 }

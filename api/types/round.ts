@@ -6,6 +6,11 @@ export interface CreateNextRoundResponse {
   matches: Match[];
 }
 
+export interface FillInCurrentRoundResponse {
+  event: Event;
+  matches: Match[];
+}
+
 export interface DeleteCurrentRoundResponse {
   event: Event;
 }

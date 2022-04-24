@@ -56,15 +56,15 @@ const getRankedPlayers = async (event: Event): Promise<Player[]> => {
   return shuffle(players);
 };
 
-export const getRankedPairings = async (event: Event): Promise<[string, string, number][]> => {
+export const getRankedPairings = async (event: Event, round: number): Promise<[string, string, number][]> => {
   const players = await getRankedPlayers(event);
   const { matches } = await Server.listEventMatches(event.id);
 
-  const playersToRemove: Set<Player> = new Set();
-  const playerOpponents: Map<Player, Set<Player>> = new Map();
+  const playersToRemove: Set<string> = new Set();
+  const playerOpponents: Map<string, Set<string>> = new Map();
 
   players.forEach((player) => {
-    playerOpponents.set(player, new Set());
+    playerOpponents.set(player.id, new Set());
   });
 
   matches.forEach((match) => {
@@ -76,21 +76,21 @@ export const getRankedPairings = async (event: Event): Promise<[string, string, 
     };
 
     // Exclude players already in the current match.
-    if (event.currentRound === match.round) {
-      player1 && playersToRemove.add(player1);
-      player2 && playersToRemove.add(player2);
+    if (round === match.round) {
+      player1 && playersToRemove.add(player1.id);
+      player2 && playersToRemove.add(player2.id);
     }
 
     // Insert a placeholder for deleted players.
     player1 || (player1 = PLACEHOLDER_PLAYER);
     player2 || (player2 = PLACEHOLDER_PLAYER);
 
-    playerOpponents.get(player1)?.add(player2);
-    playerOpponents.get(player2)?.add(player1);
+    playerOpponents.get(player1.id)?.add(player2.id);
+    playerOpponents.get(player2.id)?.add(player1.id);
   });
 
   const edgeList: [string, string, number][] = [];
-  const rankedPlayers = players.filter((player) => !playersToRemove.has(player));
+  const rankedPlayers = players.filter((player) => !playersToRemove.has(player.id));
 
   rankedPlayers.forEach((player, playerIndex) => {
     const opponentOffset = playerIndex + 1;
@@ -98,7 +98,7 @@ export const getRankedPairings = async (event: Event): Promise<[string, string, 
     rankedPlayers.slice(opponentOffset).forEach((opponent, opponentIndex) => {
       let weight = 0;
 
-      if (playerOpponents.get(player)?.has(opponent)) {
+      if (playerOpponents.get(player.id)?.has(opponent.id)) {
         weight = -9_999_999;
       } else {
         const min = Math.min(player.points, opponent.points);

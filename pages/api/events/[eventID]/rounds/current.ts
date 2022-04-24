@@ -1,13 +1,13 @@
 import { NextApiHandler } from 'next';
 import { Server } from '../../../../../api/server';
-import type { DeleteCurrentRoundResponse } from '../../../../../api/types/round';
+import type { DeleteCurrentRoundResponse, FillInCurrentRoundResponse } from '../../../../../api/types/round';
 
-const handler: NextApiHandler<DeleteCurrentRoundResponse> = async (req, res) => {
+const handler: NextApiHandler<FillInCurrentRoundResponse | DeleteCurrentRoundResponse> = async (req, res) => {
   const eventID = req.query.eventID as string;
 
   switch (req.method) {
     case 'PATCH':
-      // TODO
+      return res.status(200).json(await Server.fillInCurrentRound(eventID));
 
     case 'DELETE':
       return res.status(200).json(await Server.deleteCurrentRound(eventID));
