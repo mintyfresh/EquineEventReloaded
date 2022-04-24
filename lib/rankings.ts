@@ -3,7 +3,6 @@ import { NIL as NIL_UUID } from 'uuid';
 import { Server } from '../api/server';
 import type { Event, Player } from '../api/types';
 import { isLoser, isTie, isWinner, MatchRecord } from './db/matches';
-import { PlayerRecord } from './db/players';
 
 export const getPlayerStatistics = (playerID: string, matches: MatchRecord[]): [number, number, number] => {
   // Only consider matches the player is involved in.

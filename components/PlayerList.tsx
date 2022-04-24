@@ -1,4 +1,4 @@
-import { ListGroup } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import type { Player, UpdateEventPlayerInput } from '../api/types';
 import PlayerListItem from './PlayerList/PlayerListItem';
 
@@ -10,17 +10,29 @@ export interface PlayerListProps {
 
 const PlayerList: React.FC<PlayerListProps> = ({ players, onPlayerUpdate, onPlayerDelete }) => {
   return (
-    <ListGroup>
-      {players.map((player) => (
-        <ListGroup.Item key={player.id}>
+    <Table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Wins</th>
+          <th>Losses</th>
+          <th>Ties</th>
+          <th>Points</th>
+          <th>Opponent Win %</th>
+          <th className="text-end">Controls</th>
+        </tr>
+      </thead>
+      <tbody>
+        {players.map((player) => (
           <PlayerListItem
+            key={player.id}
             player={player}
             onPlayerUpdate={onPlayerUpdate}
             onPlayerDelete={onPlayerDelete}
           />
-        </ListGroup.Item>
-      ))}
-    </ListGroup>
+        ))}
+      </tbody>
+    </Table>
   );
 };
 

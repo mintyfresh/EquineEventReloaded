@@ -22,32 +22,36 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({ player, onPlayerUpdate,
   };
 
   return (
-    <>
-      <span>
-        {player.name} -
-        [{player.wins}, {player.losses}, {player.ties}]
-        - {player.points} points
-        - {player.opponentWinPercentage.toFixed(4)}%
-      </span>
-      {player.paid || <UnpaidBadge />}
-      {player.dropped && <DroppedBadge />}
-      <EllipsisDropdown className="float-end">
-        <Dropdown.Item onClick={() => toggleAttribute('paid')}>
-          Mark {player.paid ? 'unpaid' : 'paid'}
-        </Dropdown.Item>
-        <Dropdown.Item onClick={() => toggleAttribute('dropped')}>
-          {player.dropped ? 'Restore' : 'Drop'}
-        </Dropdown.Item>
-        <Dropdown.Divider />
-        <Dropdown.Item className="text-danger" onClick={async () => {
-          if (confirm(`Are you sure you want to delete "${player.name}"?`)) {
-            await onPlayerDelete(player);
-          }
-        }}>
-          Delete
-        </Dropdown.Item>
-      </EllipsisDropdown>
-    </>
+    <tr>
+      <td>
+        {player.name}
+        {player.paid || <UnpaidBadge />}
+        {player.dropped && <DroppedBadge />}
+      </td>
+      <td>{player.wins}</td>
+      <td>{player.losses}</td>
+      <td>{player.ties}</td>
+      <td>{player.points}</td>
+      <td>{(player.opponentWinPercentage * 100).toFixed(2)}%</td>
+      <td>
+        <EllipsisDropdown className="float-end">
+          <Dropdown.Item onClick={() => toggleAttribute('paid')}>
+            Mark {player.paid ? 'unpaid' : 'paid'}
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => toggleAttribute('dropped')}>
+            {player.dropped ? 'Restore' : 'Drop'}
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item className="text-danger" onClick={async () => {
+            if (confirm(`Are you sure you want to delete "${player.name}"?`)) {
+              await onPlayerDelete(player);
+            }
+          }}>
+            Delete
+          </Dropdown.Item>
+        </EllipsisDropdown>
+      </td>
+    </tr>
   );
 };
 
