@@ -60,9 +60,8 @@ const handler: NextApiHandler = async (req, res) => {
         match.table = index;
       });
 
-      console.log(matchInputs);
       const matches = await createBulkMatches(matchInputs);
-      const updatedEvent = await Server.updateEvent(eventID, { current_round: event.currentRound + 1 });
+      const { event: updatedEvent } = await Server.updateEvent(eventID, { current_round: event.currentRound + 1 });
 
       return res.status(200).json({
         event: updatedEvent,

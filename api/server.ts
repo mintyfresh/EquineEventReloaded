@@ -1,6 +1,7 @@
 import * as events from './server/event';
 import * as matches from './server/match';
 import * as players from './server/player';
+import * as rounds from './server/round';
 
 export namespace Server {
   export const listEvents  = events.listEvents;
@@ -18,4 +19,6 @@ export namespace Server {
   export const createEventPlayer = players.createEventPlayer;
   export const updateEventPlayer = players.updateEventPlayer;
   export const deleteEventPlayer = players.deleteEventPlayer;
+
+  export const deleteCurrentRound = rounds.deleteCurrentRound;
 }

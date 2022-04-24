@@ -1,6 +1,7 @@
 import * as event from './client/event';
 import * as match from './client/match';
 import * as player from './client/player';
+import * as round from './client/round';
 
 export namespace Client {
   export const listEvents  = event.listEvents;
@@ -17,4 +18,6 @@ export namespace Client {
   export const createEventPlayer = player.createEventPlayer;
   export const updateEventPlayer = player.updateEventPlayer;
   export const deleteEventPlayer = player.deleteEventPlayer;
+
+  export const deleteCurrentRound = round.deleteCurrentRound;
 }

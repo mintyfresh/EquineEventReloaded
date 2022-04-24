@@ -1,4 +1,4 @@
-import { createBulkRecords, createRecord, deleteRecord, getRecordByID, getRecordsByIDs, getRecordsByKey, Record, updateRecord } from './records';
+import { createBulkRecords, createRecord, deleteBulkRecords, deleteRecord, getRecordByID, getRecordsByIDs, getRecordsByKey, Record, updateRecord } from './records';
 import { PlayerRecord } from './players';
 
 export interface MatchRecord extends Record {
@@ -42,6 +42,7 @@ export type UpdateMatchInput = Pick<MatchRecord, 'winner'>;
 export const updateMatch = updateRecord<MatchRecord, UpdateMatchInput>();
 
 export const deleteMatch = deleteRecord<MatchRecord>();
+export const deleteBulkMatches = deleteBulkRecords<MatchRecord>();
 
 export const isWinner = (match: MatchRecord, player: PlayerRecord): boolean => {
   return match.winner === player._id;

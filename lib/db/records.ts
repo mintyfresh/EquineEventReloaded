@@ -145,3 +145,28 @@ export const deleteRecord = <T extends Record>() => {
     });
   };
 };
+
+export const deleteBulkRecords = <T extends Record>() => {
+  return async (records: (Pick<T, '_id'> & Partial<Pick<T, '_rev'>>)[]): Promise<void> => {
+    const missingRevs = records.filter((record) => !record._rev);
+
+    if (missingRevs.length > 0) {
+      const docs = await getRecordsByIDs<T>()(missingRevs.map((record) => record._id));
+
+      missingRevs.forEach((record) => {
+        record._rev = docs.find((doc) => doc._id === record._id)?._rev;
+      });
+    }
+
+    const payloads = records.map((record) => ({
+      ...record,
+      _deleted: true
+    }));
+
+    await fetch(`http://localhost:5984/eer/_bulk_docs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ docs: payloads })
+    });
+  };
+};
