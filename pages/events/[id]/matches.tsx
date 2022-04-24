@@ -59,16 +59,11 @@ const EventMatchesPage: NextPageWithLayout<EventMatchesPageProps> = ({ event: in
   };
 
   const pairNextRound = async () => {
-    const response = await fetch(`/api/events/${event.id}/rounds/next`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    const { event: updatedEvent, matches } = await response.json();
+    const { event: updatedEvent, matches: newMatches } = await Client.createNextRound(event.id);
 
     setEvent(updatedEvent);
-    setMatches(matches);
-    setRoundFilter(matches[0]?.round || roundFilter);
+    setMatches([...newMatches, ...matches]);
+    setRoundFilter(newMatches[0]?.round || roundFilter);
   };
 
   const unpairLastRound = async () => {

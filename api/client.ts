@@ -19,5 +19,6 @@ export namespace Client {
   export const updateEventPlayer = player.updateEventPlayer;
   export const deleteEventPlayer = player.deleteEventPlayer;
 
+  export const createNextRound    = round.createNextRound;
   export const deleteCurrentRound = round.deleteCurrentRound;
 }

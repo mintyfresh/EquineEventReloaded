@@ -20,5 +20,6 @@ export namespace Server {
   export const updateEventPlayer = players.updateEventPlayer;
   export const deleteEventPlayer = players.deleteEventPlayer;
 
+  export const createNextRound    = rounds.createNextRound;
   export const deleteCurrentRound = rounds.deleteCurrentRound;
 }
