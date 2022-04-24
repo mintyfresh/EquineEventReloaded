@@ -16,9 +16,13 @@ export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async
 
   const { event } = await Server.getEvent(params.id as string);
   const { matches } = await Server.listEventMatches(params.id as string);
+  const currentRound = matches.reduce((max, m) => Math.max(max, m.round), 0);
 
   return {
-    props: { event, matches }
+    props: {
+      event,
+      matches: matches.filter((match) => match.round === currentRound)
+    }
   };
 };
 

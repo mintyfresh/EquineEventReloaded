@@ -55,7 +55,7 @@ export const createNextRound = async (eventID: string): Promise<CreateNextRoundR
   });
 
   matchInputs.forEach((match, index) => {
-    match.table = index;
+    match.table = index + 1;
   });
 
   const matches = await createBulkMatches(matchInputs);
