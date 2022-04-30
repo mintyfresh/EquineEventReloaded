@@ -19,3 +19,9 @@ npm run build
 ```bash
 npm run start
 ```
+
+## Running the App with Docker
+
+```bash
+docker-compose up
+```
