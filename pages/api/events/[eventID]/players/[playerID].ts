@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-import { Server } from '../../../../../api/server';
+import { deleteEventPlayer, getEventPlayer, updateEventPlayer } from '../../../../../api/server';
 import type { DeleteEventPlayerResponse, GetEventPlayerResponse, UpdateEventPlayerResponse } from '../../../../../api/types';
 
 const handler: NextApiHandler<GetEventPlayerResponse | UpdateEventPlayerResponse | DeleteEventPlayerResponse | { error: any }> = async (req, res) => {
@@ -9,14 +9,14 @@ const handler: NextApiHandler<GetEventPlayerResponse | UpdateEventPlayerResponse
   try {
     switch (req.method) {
       case 'GET':
-        return res.status(200).json(await Server.getEventPlayer(eventID, playerID));
+        return res.status(200).json(await getEventPlayer(eventID, playerID));
 
       case 'PUT':
       case 'PATCH':
-        return res.status(200).json(await Server.updateEventPlayer(eventID, playerID, req.body.input));
+        return res.status(200).json(await updateEventPlayer(eventID, playerID, req.body.input));
       
       case 'DELETE':
-        return res.status(200).json(await Server.deleteEventPlayer(eventID, playerID));
+        return res.status(200).json(await deleteEventPlayer(eventID, playerID));
 
       default:
         res.setHeader('Allow', ['GET', 'PUT', 'PATCH', 'DELETE']);

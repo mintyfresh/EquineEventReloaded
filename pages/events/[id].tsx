@@ -1,6 +1,6 @@
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
-import { Server } from '../../api/server';
+import { getEvent } from '../../api/server';
 import type { Event } from '../../api/types';
 import EventLayout from '../../components/EventLayout';
 import type { NextPageWithLayout } from '../../types/next-page';
@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps<ShowEventPageProps> = async 
   }
 
   return {
-    props: await Server.getEvent(params.id as string)
+    props: await getEvent(params.id as string)
   };
 };
 

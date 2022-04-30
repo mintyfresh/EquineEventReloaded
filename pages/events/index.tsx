@@ -2,7 +2,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useState } from 'react';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { Client } from '../../api/client';
-import { Server } from '../../api/server';
+import { listEvents } from '../../api/server';
 import type { CreateEventInput, Event } from '../../api/types';
 import EventCreateForm from '../../components/EventCreateForm';
 import EventList from '../../components/EventList';
@@ -10,7 +10,7 @@ import EventMergeModal from '../../components/EventMergeModal';
 
 export const getServerSideProps: GetServerSideProps<IndexEventsPageProps> = async () => {
   return {
-    props: await Server.listEvents(),
+    props: await listEvents(),
   };
 };
 

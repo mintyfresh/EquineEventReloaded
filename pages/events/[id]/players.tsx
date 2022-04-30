@@ -2,7 +2,7 @@ import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import { Client } from '../../../api/client';
-import { Server } from '../../../api/server';
+import { listEventPlayers } from '../../../api/server';
 import type { Event, Player, UpdateEventPlayerInput } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import PlayerCreateForm from '../../../components/PlayerCreateForm';
@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps<EventPlayersPageProps> = asy
   }
 
   return {
-    props: await Server.listEventPlayers(params.id as string)
+    props: await listEventPlayers(params.id as string)
   };
 };
 

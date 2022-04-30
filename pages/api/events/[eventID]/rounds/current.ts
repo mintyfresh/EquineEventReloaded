@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-import { Server } from '../../../../../api/server';
+import { deleteCurrentRound, fillInCurrentRound } from '../../../../../api/server';
 import type { DeleteCurrentRoundResponse, FillInCurrentRoundResponse } from '../../../../../api/types/round';
 
 const handler: NextApiHandler<FillInCurrentRoundResponse | DeleteCurrentRoundResponse> = async (req, res) => {
@@ -7,10 +7,10 @@ const handler: NextApiHandler<FillInCurrentRoundResponse | DeleteCurrentRoundRes
 
   switch (req.method) {
     case 'PATCH':
-      return res.status(200).json(await Server.fillInCurrentRound(eventID));
+      return res.status(200).json(await fillInCurrentRound(eventID));
 
     case 'DELETE':
-      return res.status(200).json(await Server.deleteCurrentRound(eventID));
+      return res.status(200).json(await deleteCurrentRound(eventID));
 
     default:
       res.setHeader('Allow', ['PATCH', 'DELETE']);

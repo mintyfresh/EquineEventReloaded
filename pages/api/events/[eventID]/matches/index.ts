@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-import { Server } from '../../../../../api/server';
+import { listEventMatches } from '../../../../../api/server';
 import type { ListEventMatchesResponse } from '../../../../../api/types';
 
 const handler: NextApiHandler<ListEventMatchesResponse | { error: any }> = async (req, res) => {
@@ -8,7 +8,7 @@ const handler: NextApiHandler<ListEventMatchesResponse | { error: any }> = async
   try {
     switch (req.method) {
       case 'GET':
-        return res.status(200).json(await Server.listEventMatches(eventID));
+        return res.status(200).json(await listEventMatches(eventID));
 
       default:
         res.setHeader('Allow', ['GET']);

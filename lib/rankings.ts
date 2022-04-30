@@ -1,6 +1,6 @@
 import { shuffle } from 'lodash';
 import { NIL as NIL_UUID } from 'uuid';
-import { Server } from '../api/server';
+import { listEventMatches, listEventPlayers } from '../api/server';
 import type { Event, Player } from '../api/types';
 import { isLoser, isTie, isWinner, MatchRecord } from './db/matches';
 
@@ -77,7 +77,7 @@ const isEligibleForMatch = (player: Player): boolean => {
 };
 
 const getRankedPlayers = async (event: Event): Promise<Player[]> => {
-  const players = (await Server.listEventPlayers(event.id)).players.filter(isEligibleForMatch);
+  const players = (await listEventPlayers(event.id)).players.filter(isEligibleForMatch);
 
   // Add a placeholder player if there are an odd number of players.
   if (players.length & 1) {
@@ -89,7 +89,7 @@ const getRankedPlayers = async (event: Event): Promise<Player[]> => {
 
 export const getRankedPairings = async (event: Event, round: number): Promise<[string, string, number][]> => {
   const players = await getRankedPlayers(event);
-  const { matches } = await Server.listEventMatches(event.id);
+  const { matches } = await listEventMatches(event.id);
 
   const playersToRemove: Set<string> = new Set();
   const playerOpponents: Map<string, Set<string>> = new Map();

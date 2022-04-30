@@ -3,11 +3,10 @@ import type { GetServerSideProps } from 'next';
 import { ReactElement, useState } from 'react';
 import { Button, ButtonToolbar, Card, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { Client } from '../../../api/client';
-import { Server } from '../../../api/server';
+import { getEvent, listEventMatches } from '../../../api/server';
 import type { Event, Match, UpdateEventMatchInput } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import MatchList from '../../../components/MatchList';
-import { getRankedPairings } from '../../../lib/rankings';
 import type { NextPageWithLayout } from '../../../types/next-page';
 
 export const getServerSideProps: GetServerSideProps<EventMatchesPageProps> = async ({ params }) => {
@@ -17,8 +16,8 @@ export const getServerSideProps: GetServerSideProps<EventMatchesPageProps> = asy
     };
   }
 
-  const { event } = await Server.getEvent(params.id as string);
-  const { matches } = await Server.listEventMatches(params.id as string);
+  const { event } = await getEvent(params.id as string);
+  const { matches } = await listEventMatches(params.id as string);
 
   return {
     props: { event, matches }

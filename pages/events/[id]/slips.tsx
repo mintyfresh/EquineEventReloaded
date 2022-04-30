@@ -1,8 +1,8 @@
 import type { GetServerSideProps } from 'next';
 import type { ReactElement } from 'react';
 import { Card } from 'react-bootstrap';
-import { Server } from '../../../api/server';
-import { Event, Match } from '../../../api/types';
+import { getEvent, listEventMatches } from '../../../api/server';
+import type { Event, Match } from '../../../api/types';
 import EventLayout from '../../../components/EventLayout';
 import Slip from '../../../components/Slip';
 import type { NextPageWithLayout } from '../../../types/next-page';
@@ -14,8 +14,8 @@ export const getServerSideProps: GetServerSideProps<EventSlipsPageProps> = async
     };
   }
 
-  const { event } = await Server.getEvent(params.id as string);
-  const { matches } = await Server.listEventMatches(params.id as string);
+  const { event } = await getEvent(params.id as string);
+  const { matches } = await listEventMatches(params.id as string);
   const currentRound = matches.reduce((max, m) => Math.max(max, m.round), 0);
 
   return {
