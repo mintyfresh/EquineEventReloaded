@@ -15,7 +15,7 @@ services:
     image: curlimages/curl:7.83.0
     depends_on:
       - couchdb
-    command: sh -c 'sleep 5; curl http://couchdb:5984/eer | grep 'not_found'; if [[ $$? -eq 0 ]]; then echo "Making it..."; curl -X PUT http://admin:admin@couchdb:5984/eer; curl -X PUT http://admin:admin@couchdb:5984/eer/_design/eer -d @/db/schema.json; fi'
+    command: sh -c 'sleep 5;  curl http://admin:admin@couchdb:5984/_users | grep 'not_found'; if [[ $$? -eq 0 ]]; then curl -X PUT http://admin:admin@couchdb:5984/_users; curl -X PUT http://admin:admin@couchdb:5984/_replicator; curl -X PUT http://admin:admin@couchdb:5984/_global_changes; fi; curl http://admin:admin@couchdb:5984/eer | grep 'not_found'; if [[ $$? -eq 0 ]]; then echo "Making it..."; curl -X PUT http://admin:admin@couchdb:5984/eer; curl -X PUT http://admin:admin@couchdb:5984/eer/_design/eer -d @/db/schema.json; fi'
     volumes:
       - ./db:/db/
 
