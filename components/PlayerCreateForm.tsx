@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button, Col, Form, Row, ToggleButton } from 'react-bootstrap';
-import { createPlayer, PlayerRecord } from '../lib/db/players';
+import type { CreateEventPlayerInput } from '../api/types';
 
 export interface PlayerCreateFormProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onSubmit'> {
-  onPlayerCreate: (player: PlayerRecord) => (void | Promise<void>);
+  onPlayerCreate: (player: CreateEventPlayerInput) => (void | Promise<void>);
 }
 
 const PlayerCreateForm: React.FC<PlayerCreateFormProps> = ({ onPlayerCreate, ...props }) => {
@@ -13,9 +13,7 @@ const PlayerCreateForm: React.FC<PlayerCreateFormProps> = ({ onPlayerCreate, ...
   return (
     <Form {...props} onSubmit={async (event) => {
       event.preventDefault();
-      const player = await createPlayer({ name, paid });
-
-      await onPlayerCreate(player);
+      await onPlayerCreate({ name, paid });
 
       // Reset inputs.
       setName('');
