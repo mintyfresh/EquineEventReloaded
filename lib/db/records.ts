@@ -18,9 +18,12 @@ export interface RecordList<T extends Record> {
   total_count: number;
 }
 
+const COUCHDB_HOST = process.env.NEXT_PUBLIC_COUCHDB_HOST;
+const COUCHDB_PORT = process.env.NEXT_PUBLIC_COUCHDB_PORT;
+
 export const getRecordByID = <T extends Record>() => {
   return async (id: string): Promise<T> => {
-    const response = await fetch(`http://localhost:5984/eer/${id}`);
+    const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/${id}`);
     const data = await response.json();
 
     if (data.error) {
@@ -34,7 +37,7 @@ export const getRecordByID = <T extends Record>() => {
 export const getRecordsByIDs = <T extends Record>() => {
   return async (ids: string[]): Promise<T[]> => {
     const docs = ids.map((id) => ({ id }));
-    const response = await fetch(`http://localhost:5984/eer/_bulk_get`, {
+    const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/_bulk_get`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ docs })
@@ -49,7 +52,7 @@ export const getRecordsByIDs = <T extends Record>() => {
 
 export const getRecordsByKey = <T extends Record>(view: string) => {
   return async (key: string): Promise<T[]> => {
-    const response = await fetch(`http://localhost:5984/eer/_design/eer/_view/${view}?key=${JSON.stringify([key])}`);
+    const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/_design/eer/_view/${view}?key=${JSON.stringify([key])}`);
     const { rows }: RecordList<T> = await response.json();
 
     return rows.map((record) => record.value);
@@ -70,7 +73,7 @@ export const createRecord = <T extends Record, TInput, TDefaults = Omit<T, '_id'
       _rev: undefined
     };
 
-    const response = await fetch(`http://localhost:5984/eer`, {
+    const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -96,7 +99,7 @@ export const createBulkRecords = <T extends Record, TInput, TDefaults = Omit<T, 
       _rev: undefined
     }));
 
-    const response = await fetch(`http://localhost:5984/eer/_bulk_docs`, {
+    const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/_bulk_docs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ docs: payloads })
@@ -120,7 +123,7 @@ export const updateRecord = <T extends Record, TInput>() => {
       ...input
     };
 
-    const response = await fetch(`http://localhost:5984/eer/${record._id}?rev=${record._rev}`, {
+    const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/${record._id}?rev=${record._rev}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -140,7 +143,7 @@ export const deleteRecord = <T extends Record>() => {
   return async (record: Pick<T, '_id'> & Partial<Pick<T, '_rev'>>): Promise<void> => {
     const _rev = record._rev ?? (await getRecordByID<T>()(record._id))._rev;
 
-    await fetch(`http://localhost:5984/eer/${record._id}?rev=${_rev}`, {
+    await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/${record._id}?rev=${_rev}`, {
       method: 'DELETE'
     });
   };
@@ -163,7 +166,7 @@ export const deleteBulkRecords = <T extends Record>() => {
       _deleted: true
     }));
 
-    await fetch(`http://localhost:5984/eer/_bulk_docs`, {
+    await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/_bulk_docs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ docs: payloads })

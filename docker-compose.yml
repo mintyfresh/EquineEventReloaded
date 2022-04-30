@@ -1,0 +1,45 @@
+version: '3.9'
+services:
+  couchdb:
+    image: couchdb:2.3.1
+    restart: always
+    ports:
+      - 5984:5984
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    volumes:
+      - ./.couchdb:/opt/couchdb/data
+
+  prepare_schema:
+    image: curlimages/curl:7.83.0
+    depends_on:
+      - couchdb
+    command: sh -c 'sleep 5; curl http://couchdb:5984/eer | grep 'not_found'; if [[ $$? -eq 0 ]]; then echo "Making it..."; curl -X PUT http://admin:admin@couchdb:5984/eer; curl -X PUT http://admin:admin@couchdb:5984/eer/_design/eer -d @/db/schema.json; fi'
+    volumes:
+      - ./db:/db/
+
+  pairing:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8156:8156
+
+  client:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        COUCHDB_HOST: 'couchdb'
+        COUCHDB_PORT: '5984'
+        PAIRING_HOST: 'pairing'
+        PAIRING_PORT: '8156'
+    depends_on:
+      - couchdb
+      - prepare_schema
+      - pairing
+    restart: always
+    ports:
+      - 4500:3000

@@ -1,0 +1,10 @@
+Dockerfile
+.dockerignore
+db
+node_modules
+server
+npm-debug.log
+.git
+.next
+.vscode
+.couchdb

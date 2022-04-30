@@ -11,15 +11,18 @@ export interface EventRecord extends Record {
   eventType: string;
 }
 
+const COUCHDB_HOST = process.env.NEXT_PUBLIC_COUCHDB_HOST;
+const COUCHDB_PORT = process.env.NEXT_PUBLIC_COUCHDB_PORT;
+
 export const listEvents = async (): Promise<EventRecord[]> => {
-  const response = await fetch('http://localhost:5984/eer/_design/eer/_view/events');
+  const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/_design/eer/_view/events`);
   const { rows }: RecordList<EventRecord> = await response.json();
 
   return rows.map((event) => event.value);
 };
 
 export const getEvent = async (id: string): Promise<EventRecord> => {
-  const response = await fetch(`http://localhost:5984/eer/${id}`);
+  const response = await fetch(`http://${COUCHDB_HOST}:${COUCHDB_PORT}/eer/${id}`);
   const data = await response.json();
 
   if (data.error) {

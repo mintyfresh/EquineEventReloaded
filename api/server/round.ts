@@ -6,9 +6,12 @@ import { getEvent, updateEvent } from './event';
 import { listEventMatches } from './match';
 import { listEventPlayers } from './player';
 
+const PAIRING_HOST = process.env.NEXT_PUBLIC_PAIRING_HOST;
+const PAIRING_PORT = process.env.NEXT_PUBLIC_PAIRING_PORT;
+
 const buildMatchInputsForRound = async (event: Event, round: number, players: Player[]): Promise<CreateMatchInput[]> => {
   const pairings = await getRankedPairings(event, round);
-  const response = await fetch('http://localhost:8156', {
+  const response = await fetch(`http://${PAIRING_HOST}:${PAIRING_PORT}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(pairings)
